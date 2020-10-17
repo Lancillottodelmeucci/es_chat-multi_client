@@ -3,3 +3,6 @@ ServerChatApplication/build/
 ServerChatApplication/nbproject/
 *.xml
 *.mf
+ClientChatApplication/test/
+ClientChatApplication/build/
+ClientChatApplication/nbproject/
