@@ -6,12 +6,16 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 /**
- *
- * @author giova
+ * La classe che permette a più client di connettersi alla chat
+ * @author Giovanni Ciaranfi
  */
 public class MultiServer {
     ServerSocket server_socket;
     ArrayList<Socket> client_disponibili=new ArrayList();
+    /**
+     * Il metodo che apre la porta sulla quale attivare il servizio della chat, 
+     * e crea il ciclo per ricevere la connessione da parte di più client
+     */
     public void avvia(){
         try {
             server_socket=new ServerSocket(7777);

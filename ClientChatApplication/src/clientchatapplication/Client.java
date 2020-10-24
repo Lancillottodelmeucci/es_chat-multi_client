@@ -8,8 +8,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 /**
- *
- * @author giova
+ * La classe che gestisce i thread per la comunicazione col server e che 
+ * istanzia il socket e i canali di comunicazione
+ * @author Giovanni Ciaranfi
  */
 public class Client {
     String nome_server="127.0.0.1";
@@ -22,6 +23,11 @@ public class Client {
     BufferedReader dati_dal_server;
     ClientSendMessage c_s_m;
     ClientReceiveMessage c_r_m;
+    /**
+     * Il metodo che permette al client di connettersi al server che deve essere
+     * in attesa di connessioni
+     * @return il socket del client
+     */
     public Socket connetti(){
         System.out.println("Client in esecuzione.");
         try {
@@ -34,6 +40,7 @@ public class Client {
             dati_al_server.writeBytes(messaggio+'\n');
         }
         catch(UnknownHostException e){
+            System.err.println(e.getMessage());
             System.err.println("Host non riconosciuto.");
         }
         catch (IOException e) {
@@ -43,6 +50,9 @@ public class Client {
         }
         return(socket);
     }
+    /**
+     * Il metodo che lancia i thread per l'invio e la ricezione dei messaggi
+     */
     public void comunica(){
         c_s_m=new ClientSendMessage(this);
         c_r_m=new ClientReceiveMessage(this);

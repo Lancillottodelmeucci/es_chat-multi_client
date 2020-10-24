@@ -9,8 +9,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 /**
- *
- * @author giova
+ * Classe che implementa la gestione del processo server dedicato ad ogni client
+ * connessso
+ * @author Giovanni Ciaranfi
  */
 public class ServerChat implements Runnable{
     ServerSocket socket_server=null;
@@ -21,6 +22,11 @@ public class ServerChat implements Runnable{
     DataOutputStream dati_al_client;
     ArrayList<Socket> client_disponibili;
     DataOutputStream dati_al_partner;
+    /**
+     * Costruttore parametrizzato della classe
+     * @param s il socket del client connesso
+     * @param s_a la lista dei socket connessi alla chats
+     */
     public ServerChat(Socket s,ArrayList<Socket> s_a){
         this.client_disponibili=s_a;
         this.socket_client=s;
@@ -34,6 +40,10 @@ public class ServerChat implements Runnable{
             System.exit(0);
         }
     }
+    /**
+     * Il metodo che lancia la comunicazione client-server
+     */
+    @Override
     public void run() {
         try {
             chat();
@@ -41,6 +51,11 @@ public class ServerChat implements Runnable{
             e.printStackTrace(System.out);
         }
     }
+    /**
+     * Il metodo che gestisce la comunicazione tra il client e il server, e che 
+     * invia i messaggi agli altri utenti
+     * @throws IOException lanciata in caso di errori nell gestione dei flussi di comunicazione
+     */
     public void chat() throws IOException{
         System.out.println(Thread.currentThread().getName()+" >> "+"In attesa del nominativo del client.");
         messaggio_client=dati_dal_client.readLine();

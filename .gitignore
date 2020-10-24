@@ -6,3 +6,5 @@ ServerChatApplication/nbproject/
 ClientChatApplication/test/
 ClientChatApplication/build/
 ClientChatApplication/nbproject/
+/ClientChatApplication/dist/
+/ServerChatApplication/dist/
