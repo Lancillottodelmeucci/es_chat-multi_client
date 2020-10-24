@@ -25,17 +25,17 @@ public class MultiServer {
             }
         }
         catch (IOException e) {
-            System.out.println(e.getMessage());
-            System.out.println("Errore nell'istanza del server.");
-            System.exit(1);
+            System.err.println(e.getMessage());
+            System.err.println("Errore nell'istanza del server.");
+            System.exit(0);
         }
         try {
             server_socket.close();
         }
         catch (IOException e) {
-            System.out.println(e.getMessage());
-            System.out.println("Errore nella chiusura del server.");
-            System.exit(1);
+            System.err.println(e.getMessage());
+            System.err.println("Errore nella chiusura del server.");
+            System.exit(0);
         }
     }
 }

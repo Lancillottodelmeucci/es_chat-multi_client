@@ -42,16 +42,16 @@ class ClientReceiveMessage implements Runnable{
                     return;
                 }
                 //if(risposta)
-                System.out.println("R/: "+risposta);
+                System.out.println(risposta);
                 /*if(risposta.equals("FINE")){//chiusura bla bla bla
                     System.out.println("Chiusura dell'esecuzione.");
                     socket.close();
                 }*/
             }
             catch (IOException e) {
-                System.out.println(e.getMessage());
-                System.out.println("Errore durante la comunicazione col server.");
-                System.exit(1);
+                System.err.println(e.getMessage());
+                System.err.println("Errore durante la comunicazione col server.");
+                System.exit(0);
             }
         }
     }

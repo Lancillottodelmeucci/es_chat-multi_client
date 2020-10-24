@@ -37,9 +37,9 @@ public class Client {
             System.err.println("Host non riconosciuto.");
         }
         catch (IOException e) {
-            System.out.println(e.getMessage());
-            System.out.println("Errore durante la connessione.");
-            System.exit(1);
+            System.err.println(e.getMessage());
+            System.err.println("Errore durante la connessione.");
+            System.exit(0);
         }
         return(socket);
     }

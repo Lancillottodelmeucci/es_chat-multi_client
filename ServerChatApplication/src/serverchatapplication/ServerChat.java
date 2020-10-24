@@ -30,9 +30,9 @@ public class ServerChat implements Runnable{
             dati_al_client=new DataOutputStream(socket_client.getOutputStream());
         }
         catch (IOException e) {
-            System.out.println(e.getMessage());
-            System.out.println("Errore nell'istanza dei canali di comunicazione.");
-            System.exit(1);
+            System.err.println(e.getMessage());
+            System.err.println("Errore nell'istanza dei canali di comunicazione.");
+            System.exit(0);
         }
     }
     public void run() {
@@ -64,9 +64,9 @@ public class ServerChat implements Runnable{
                         dati_al_partner.writeBytes(nome_client+" si e' connesso.\n");
                     }
                     catch (IOException e) {
-                        System.out.println(e.getMessage());
-                        System.out.println(Thread.currentThread().getName()+" >> "+"Errore nella comunicazione col partner del client.");
-                        System.exit(1);
+                        System.err.println(e.getMessage());
+                        System.err.println(Thread.currentThread().getName()+" >> "+"Errore nella comunicazione col partner del client.");
+                        System.exit(0);
                     }
                 }
             });
@@ -75,9 +75,9 @@ public class ServerChat implements Runnable{
             try {
                 dati_al_client.writeBytes("Sei l'unico utente attualemente connesso.\n");
             } catch (IOException e) {
-                System.out.println(e.getMessage());
-                System.out.println(Thread.currentThread().getName()+" >> "+"Errore nella comunicazione col partner del client.");
-                System.exit(1);
+                System.err.println(e.getMessage());
+                System.err.println(Thread.currentThread().getName()+" >> "+"Errore nella comunicazione col partner del client.");
+                System.exit(0);
             }
         }
         for(;;){
@@ -95,9 +95,9 @@ public class ServerChat implements Runnable{
                                 dati_al_partner.writeBytes(nome_client+" si e' disconnesso.\n");
                             }
                             catch (IOException e) {
-                                System.out.println(e.getMessage());
-                                System.out.println(Thread.currentThread().getName()+" >> "+"Errore nella comunicazione col partner del client.");
-                                System.exit(1);
+                                System.err.println(e.getMessage());
+                                System.err.println(Thread.currentThread().getName()+" >> "+"Errore nella comunicazione col partner del client.");
+                                System.exit(0);
                             }
                         }
                     });
@@ -117,12 +117,13 @@ public class ServerChat implements Runnable{
                         }
                         catch (IOException e) {
                             try {
+                                System.err.println(e.getMessage());
                                 dati_al_client.writeBytes("Errore durante la comunicazione col partner: chiudere la connessione o attendere un partner.\n");
                             }
                             catch (IOException ex) {
-                                System.out.println(Thread.currentThread().getName()+" >> "+ex.getMessage());
-                                System.out.println(Thread.currentThread().getName()+" >> "+"Errore nella comunicazione col client.");
-                                System.exit(1);
+                                System.err.println(Thread.currentThread().getName()+" >> "+ex.getMessage());
+                                System.err.println(Thread.currentThread().getName()+" >> "+"Errore nella comunicazione col client.");
+                                System.exit(0);
                             }
                         }
                     }
