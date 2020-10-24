@@ -38,7 +38,8 @@ class ClientSendMessage implements Runnable{
                 //System.out.println("Risposta del server: "+risposta);
                 if(messaggio.toUpperCase().equals("FINE")){
                     System.out.println("Chiusura dell'esecuzione.");
-                    socket.close();
+                    //socket.close();
+                    return;
                 }
             }
             catch (IOException e) {

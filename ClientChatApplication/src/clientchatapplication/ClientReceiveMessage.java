@@ -36,7 +36,13 @@ class ClientReceiveMessage implements Runnable{
                 //System.out.println("Invio del messaggio al server.");
                 //dati_al_server.writeBytes(messaggio+'\n');
                 risposta=dati_dal_server.readLine();
-                System.out.println("Risposta del server: "+risposta);
+                if(risposta.toUpperCase().equals("FINE")){
+                    System.out.println("Chiusura dell'esecuzione.");
+                    socket.close();
+                    return;
+                }
+                //if(risposta)
+                System.out.println("R/: "+risposta);
                 /*if(risposta.equals("FINE")){//chiusura bla bla bla
                     System.out.println("Chiusura dell'esecuzione.");
                     socket.close();

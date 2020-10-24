@@ -13,6 +13,7 @@ public class MultiServer {
     ServerSocket server_socket;
     ArrayList<Socket> client_disponibili=new ArrayList();
     public void avvia(){
+        System.out.println("serverchatapplication.MultiServer.avvia()");
         try {
             server_socket=new ServerSocket(7777);
             for(int i=0;i<2;i++){
