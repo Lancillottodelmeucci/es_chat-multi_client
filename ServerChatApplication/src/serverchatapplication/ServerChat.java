@@ -87,6 +87,21 @@ public class ServerChat implements Runnable{
             //risposta_server="R/ "+messaggio_client;
             if(dati_dal_client==null||messaggio_client.toUpperCase().equals("FINE")){
                 dati_al_client.writeBytes("FINE\n");
+                if(client_disponibili.size()>1){
+                    client_disponibili.forEach((partner) -> {
+                        if (!partner.equals(this.socket_client)) {
+                            try {
+                                dati_al_partner=new DataOutputStream(partner.getOutputStream());
+                                dati_al_partner.writeBytes(nome_client+" si e' disconnesso.\n");
+                            }
+                            catch (IOException e) {
+                                System.out.println(e.getMessage());
+                                System.out.println(Thread.currentThread().getName()+" >> "+"Errore nella comunicazione col partner del client.");
+                                System.exit(1);
+                            }
+                        }
+                    });
+                }
                 break;
             }
             else{
@@ -114,7 +129,7 @@ public class ServerChat implements Runnable{
                     });
                 }
                 else{
-                    dati_al_client.writeBytes("Nessun partner connesso: chiudere la connessione o attendere un partner.");
+                    dati_al_client.writeBytes("Nessun partner connesso: chiudere la connessione o attendere un partner.\n");
                 }
                 /*or(int i=0;i<client_disponibili.size();i++){
                     socket_partner=client_disponibili.get(i);
@@ -130,6 +145,7 @@ public class ServerChat implements Runnable{
                 }*/
             }
         }
+        client_disponibili.remove(socket_client);
         System.out.println(Thread.currentThread().getName()+" >> "+"Comunicazione terminata.");
         dati_al_client.close();
         dati_dal_client.close();
