@@ -44,7 +44,7 @@ public class ServerChat implements Runnable{
     }
     public void chat() throws IOException{
         //try {
-        System.out.println("In attesa del nominativo del client.");
+        System.out.println(Thread.currentThread().getName()+" >> "+"In attesa del nominativo del client.");
         messaggio_client=dati_dal_client.readLine();
         if(messaggio_client==null||messaggio_client.equals("")){
             nome_client=socket_client.getInetAddress().getHostAddress()+":"+socket_client.getPort();
@@ -52,46 +52,61 @@ public class ServerChat implements Runnable{
         else{
             nome_client=messaggio_client;
         }
-        if(client_disponibili.size()>0){
+        System.out.print(Thread.currentThread().getName()+" -> ");
+        Thread.currentThread().setName("Thread."+nome_client);
+        System.out.println(Thread.currentThread().getName());
+        System.out.println(Thread.currentThread().getName()+" >> "+/*nome_client+*/" connesso.");
+        if(client_disponibili.size()>1){
             client_disponibili.forEach((partner) -> {
-                try {
-                dati_al_partner=new DataOutputStream(partner.getOutputStream());
-                    dati_al_partner.writeBytes(nome_client+" si e' connesso.\n");
-                }
-                catch (IOException e) {
-                    System.out.println(e.getMessage());
-                    System.out.println("Errore nella comunicazione col partner del client.");
-                    System.exit(1);
+                if (!partner.equals(this.socket_client)) {
+                    try {
+                        dati_al_partner=new DataOutputStream(partner.getOutputStream());
+                        dati_al_partner.writeBytes(nome_client+" si e' connesso.\n");
+                    }
+                    catch (IOException e) {
+                        System.out.println(e.getMessage());
+                        System.out.println(Thread.currentThread().getName()+" >> "+"Errore nella comunicazione col partner del client.");
+                        System.exit(1);
+                    }
                 }
             });
         }
+        else{
+            try {
+                dati_al_client.writeBytes("Sei l'unico utente attualemente connesso.\n");
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+                System.out.println(Thread.currentThread().getName()+" >> "+"Errore nella comunicazione col partner del client.");
+                System.exit(1);
+            }
+        }
         for(;;){
-            System.out.println("In attesa del messaggio da parte del client.");
+            System.out.println(Thread.currentThread().getName()+" >> "+"In attesa del messaggio da parte del client.");
             messaggio_client=dati_dal_client.readLine();
-            System.out.println("Messaggio ricevuto.");
+            System.out.println(Thread.currentThread().getName()+" >> "+"Messaggio ricevuto.");
             //risposta_server="R/ "+messaggio_client;
             if(dati_dal_client==null||messaggio_client.toUpperCase().equals("FINE")){
-                dati_al_client.writeBytes("Chiusura comunicazione\n");
+                dati_al_client.writeBytes("FINE\n");
                 break;
             }
             else{
                 //System.out.println("Invio della risposta al client.");
                 //dati_al_client.writeBytes(risposta_server);
                 //Socket socket_partner;
-                if(client_disponibili.size()>0){
+                if(client_disponibili.size()>1){
                     client_disponibili.forEach((partner) -> {
                         if(!partner.equals(this.socket_client)){
                         try {
-                            dati_al_partner=new DataOutputStream(socket_client.getOutputStream());
-                            dati_al_partner.writeBytes("Da: "+nome_client+"Testo: "+messaggio_client+'\n');
+                            dati_al_partner=new DataOutputStream(partner.getOutputStream());
+                            dati_al_partner.writeBytes("Da: "+nome_client+"\nTesto: "+messaggio_client+'\n');
                         }
                         catch (IOException e) {
                             try {
                                 dati_al_client.writeBytes("Errore durante la comunicazione col partner: chiudere la connessione o attendere un partner.\n");
                             }
                             catch (IOException ex) {
-                                System.out.println(ex.getMessage());
-                                System.out.println("Errore nella comunicazione col client.");
+                                System.out.println(Thread.currentThread().getName()+" >> "+ex.getMessage());
+                                System.out.println(Thread.currentThread().getName()+" >> "+"Errore nella comunicazione col client.");
                                 System.exit(1);
                             }
                         }
@@ -99,7 +114,7 @@ public class ServerChat implements Runnable{
                     });
                 }
                 else{
-                    dati_al_client.writeBytes("Partner non connesso: chiudere la connessione o attendere un partner.");
+                    dati_al_client.writeBytes("Nessun partner connesso: chiudere la connessione o attendere un partner.");
                 }
                 /*or(int i=0;i<client_disponibili.size();i++){
                     socket_partner=client_disponibili.get(i);
@@ -115,7 +130,7 @@ public class ServerChat implements Runnable{
                 }*/
             }
         }
-        System.out.println("Comunicazione terminata.");
+        System.out.println(Thread.currentThread().getName()+" >> "+"Comunicazione terminata.");
         dati_al_client.close();
         dati_dal_client.close();
         socket_client.close();
@@ -130,5 +145,7 @@ public class ServerChat implements Runnable{
     la seconda, alla seconda dice ad entrambi che sono connessi l'un l'altro.
     entrambi possono mandar messaggi contemporaneamente, e li ricevano nel
     formato "Da: [mittente] Testo: [messaggio]" - nel caso di chat tra due.
+    
+    Creare nuovo formato messaggio in una stringa, in una classe Messaggio
     */
 }
