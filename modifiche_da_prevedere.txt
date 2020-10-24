@@ -1,0 +1,12 @@
+-ServerChat-
+il server si avvia (porta 7777): attende due connessioni, avviate connessioni chiede il nome utente; alla prima connessione dice di attenderela seconda, alla seconda dice ad entrambi che sono connessi l'un l'altro. entrambi possono mandar messaggi contemporaneamente, e li ricevano nel formato "Da: [mittente] Testo: [messaggio]" - nel caso di chat tra due.
+Creare nuovo formato messaggio in una stringa, in una classe Messaggio
+
+-Client //ReceiveMessage //SendMessage-
+possibilità tramite speciale formato el messaggio di inviarlo solo ad un determinato partner?
+sostituire il passaggio di tutto il Client con qualcosa che racchiuda la roba in elenco sotto - un'altra classe
+
+-ClientReceiveMessage-
+gestisce il ciclo per ricevere messaggi
+-ClientSendMessage-
+gestisce il ciclo per inviare i messaggi

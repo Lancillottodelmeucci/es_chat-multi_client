@@ -16,7 +16,7 @@ class ClientSendMessage implements Runnable{
     String risposta;
     DataOutputStream dati_al_server;
     BufferedReader dati_dal_server;
-    public ClientSendMessage(Client c){//sostituire con qualcosa che racchiuda la roba in elenco sotto - classe
+    public ClientSendMessage(Client c){
         this.messaggio=c.messaggio;
         this.input_tastiera=c.input_tastiera;
         this.dati_al_server=c.dati_al_server;
@@ -27,18 +27,10 @@ class ClientSendMessage implements Runnable{
         for(;;){
             try {
                 System.out.println("Inserire il messaggio da inviare al partner:");
-                /*
-                possibilità tramite speciale formato el messaggio di inviarlo solo ad
-                un determinatopartner?
-                */
                 messaggio=input_tastiera.readLine();
-                //System.out.println("Invio del messaggio al server.");
                 dati_al_server.writeBytes(messaggio+'\n');
-                //risposta=dati_dal_server.readLine();
-                //System.out.println("Risposta del server: "+risposta);
                 if(messaggio.toUpperCase().equals("FINE")){
                     System.out.println("Chiusura dell'esecuzione.");
-                    //socket.close();
                     return;
                 }
             }
@@ -49,7 +41,4 @@ class ClientSendMessage implements Runnable{
             }
         }
     }
-    /*
-    gestisce il ciclo per inviare i messaggi
-    */
 }

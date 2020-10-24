@@ -17,7 +17,6 @@ public class ServerChat implements Runnable{
     Socket socket_client=null;
     String messaggio_client=null;
     String nome_client=null;
-    String risposta_server=null;//necessario?
     BufferedReader dati_dal_client;
     DataOutputStream dati_al_client;
     ArrayList<Socket> client_disponibili;
@@ -43,7 +42,6 @@ public class ServerChat implements Runnable{
         }
     }
     public void chat() throws IOException{
-        //try {
         System.out.println(Thread.currentThread().getName()+" >> "+"In attesa del nominativo del client.");
         messaggio_client=dati_dal_client.readLine();
         if(messaggio_client==null||messaggio_client.equals("")){
@@ -55,7 +53,7 @@ public class ServerChat implements Runnable{
         System.out.print(Thread.currentThread().getName()+" -> ");
         Thread.currentThread().setName("Thread."+nome_client);
         System.out.println(Thread.currentThread().getName());
-        System.out.println(Thread.currentThread().getName()+" >> "+/*nome_client+*/" connesso.");
+        System.out.println(Thread.currentThread().getName()+" >> connesso.");
         if(client_disponibili.size()>1){
             client_disponibili.forEach((partner) -> {
                 if (!partner.equals(this.socket_client)) {
@@ -84,7 +82,6 @@ public class ServerChat implements Runnable{
             System.out.println(Thread.currentThread().getName()+" >> "+"In attesa del messaggio da parte del client.");
             messaggio_client=dati_dal_client.readLine();
             System.out.println(Thread.currentThread().getName()+" >> "+"Messaggio ricevuto.");
-            //risposta_server="R/ "+messaggio_client;
             if(dati_dal_client==null||messaggio_client.toUpperCase().equals("FINE")){
                 dati_al_client.writeBytes("FINE\n");
                 if(client_disponibili.size()>1){
@@ -105,9 +102,6 @@ public class ServerChat implements Runnable{
                 break;
             }
             else{
-                //System.out.println("Invio della risposta al client.");
-                //dati_al_client.writeBytes(risposta_server);
-                //Socket socket_partner;
                 if(client_disponibili.size()>1){
                     client_disponibili.forEach((partner) -> {
                         if(!partner.equals(this.socket_client)){
@@ -132,18 +126,6 @@ public class ServerChat implements Runnable{
                 else{
                     dati_al_client.writeBytes("Nessun partner connesso: chiudere la connessione o attendere un partner.\n");
                 }
-                /*or(int i=0;i<client_disponibili.size();i++){
-                    socket_partner=client_disponibili.get(i);
-                    if(!socket_partner.equals(this.socket_client)){
-                        dati_al_partner=new DataOutputStream(socket_client.getOutputStream());
-                        try {
-                            dati_al_partner.writeBytes("Da: "+nome_client+"Testo: "+messaggio_client);
-                        }
-                        catch (IOException e) {
-                            dati_al_client.writeBytes("Partner non connesso: chiudere la connessione o attendere un partner.");
-                        }
-                    }
-                }*/
             }
         }
         client_disponibili.remove(socket_client);
@@ -151,10 +133,6 @@ public class ServerChat implements Runnable{
         dati_al_client.close();
         dati_dal_client.close();
         socket_client.close();
-        /*}
-        catch (IOException e) {
-            System.out.println("Errore durante la comunicazione.");
-        }*/
     }
     /*
     il server si avvia (porta 7777): attende due connessioni, avviate 
