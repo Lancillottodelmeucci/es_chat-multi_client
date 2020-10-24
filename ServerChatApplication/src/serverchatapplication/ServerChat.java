@@ -134,13 +134,4 @@ public class ServerChat implements Runnable{
         dati_dal_client.close();
         socket_client.close();
     }
-    /*
-    il server si avvia (porta 7777): attende due connessioni, avviate 
-    connessioni chiede il nome utente; alla prima connessione dice di attendere
-    la seconda, alla seconda dice ad entrambi che sono connessi l'un l'altro.
-    entrambi possono mandar messaggi contemporaneamente, e li ricevano nel
-    formato "Da: [mittente] Testo: [messaggio]" - nel caso di chat tra due.
-    
-    Creare nuovo formato messaggio in una stringa, in una classe Messaggio
-    */
 }

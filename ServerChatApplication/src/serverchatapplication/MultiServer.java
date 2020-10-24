@@ -15,8 +15,8 @@ public class MultiServer {
     public void avvia(){
         try {
             server_socket=new ServerSocket(7777);
-            for(int i=0;i<2;i++){//;;
-                System.out.println("Nuovo thread in attesa.");
+            for(;;){
+                System.out.println("Nuovo thread in attesadi un client.");
                 Socket client_socket=server_socket.accept();
                 client_disponibili.add(client_socket);
                 ServerChat server_thread=new ServerChat(client_socket,client_disponibili);
