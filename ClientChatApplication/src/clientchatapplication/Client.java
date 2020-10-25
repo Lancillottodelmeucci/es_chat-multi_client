@@ -13,8 +13,8 @@ import java.net.UnknownHostException;
  * @author Giovanni Ciaranfi
  */
 public class Client {
-    private String nome_server="127.0.0.1";
-    private int porta_server=7777;
+    private final String nome_server="127.0.0.1";
+    private final int porta_server=7777;
     private Socket socket;
     public BufferedReader input_tastiera;
     public String messaggio;

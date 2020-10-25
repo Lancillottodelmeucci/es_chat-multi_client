@@ -10,9 +10,9 @@ import java.io.IOException;
  * @author Giovanni Ciaranfi
  */
 class ClientSendMessage implements Runnable{
-    private BufferedReader input_tastiera;
+    private final BufferedReader input_tastiera;
     private String messaggio;
-    private DataOutputStream dati_al_server;
+    private final DataOutputStream dati_al_server;
     /**
      * Costruttore parametrizzato
      * @param c il client dal quale ricevere gli oggetti necessari alla comunicazione
