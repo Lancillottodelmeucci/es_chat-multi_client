@@ -14,14 +14,13 @@ import java.util.ArrayList;
  * @author Giovanni Ciaranfi
  */
 public class ServerChat implements Runnable{
-    ServerSocket socket_server=null;
-    Socket socket_client=null;
-    String messaggio_client=null;
-    String nome_client=null;
-    BufferedReader dati_dal_client;
-    DataOutputStream dati_al_client;
-    ArrayList<Socket> client_disponibili;
-    DataOutputStream dati_al_partner;
+    private Socket socket_client=null;
+    private String messaggio_client=null;
+    private String nome_client=null;
+    private BufferedReader dati_dal_client;
+    private DataOutputStream dati_al_client;
+    private ArrayList<Socket> client_disponibili;
+    private DataOutputStream dati_al_partner;
     /**
      * Costruttore parametrizzato della classe
      * @param s il socket del client connesso

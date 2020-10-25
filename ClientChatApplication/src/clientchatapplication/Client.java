@@ -13,16 +13,16 @@ import java.net.UnknownHostException;
  * @author Giovanni Ciaranfi
  */
 public class Client {
-    String nome_server="127.0.0.1";
-    int porta_server=7777;
-    Socket socket;
-    BufferedReader input_tastiera;
-    String messaggio;
-    String risposta;
-    DataOutputStream dati_al_server;
-    BufferedReader dati_dal_server;
-    ClientSendMessage c_s_m;
-    ClientReceiveMessage c_r_m;
+    private String nome_server="127.0.0.1";
+    private int porta_server=7777;
+    private Socket socket;
+    public BufferedReader input_tastiera;
+    public String messaggio;
+    public String risposta;
+    public DataOutputStream dati_al_server;
+    public BufferedReader dati_dal_server;
+    private ClientSendMessage c_s_m;
+    private ClientReceiveMessage c_r_m;
     /**
      * Il metodo che permette al client di connettersi al server che deve essere
      * in attesa di connessioni

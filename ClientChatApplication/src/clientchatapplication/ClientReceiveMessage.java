@@ -3,7 +3,6 @@ package clientchatapplication;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 
 /**
  * La classe che implemeta le funzionalità relative alla ricezione dei messaggi 
@@ -11,19 +10,14 @@ import java.net.Socket;
  * @author Giovanni Ciaranfi
  */
 class ClientReceiveMessage implements Runnable{
-    Socket socket;
-    BufferedReader input_tastiera;
-    String messaggio;
-    String risposta;
-    DataOutputStream dati_al_server;
-    BufferedReader dati_dal_server;
+    private String risposta;
+    private DataOutputStream dati_al_server;
+    private BufferedReader dati_dal_server;
     /**
      * Costruttore parametrizzato
      * @param c il client dal quale ricevere gli oggetti necessari alla comunicazione
      */
     public ClientReceiveMessage(Client c){
-        this.messaggio=c.messaggio;
-        this.input_tastiera=c.input_tastiera;
         this.dati_al_server=c.dati_al_server;
         this.dati_dal_server=c.dati_dal_server;
         this.risposta=c.risposta;

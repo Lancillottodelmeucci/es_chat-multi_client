@@ -2,7 +2,7 @@ package serverchatapplication;
 
 /**
  *
- * @author giova
+ * @author Giovanni Ciaranfi
  */
 public class ServerChatApplication {
 

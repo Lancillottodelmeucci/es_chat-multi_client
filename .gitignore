@@ -3,6 +3,7 @@ ServerChatApplication/build/
 ServerChatApplication/nbproject/
 *.xml
 *.mf
+*.drawio
 ClientChatApplication/test/
 ClientChatApplication/build/
 ClientChatApplication/nbproject/

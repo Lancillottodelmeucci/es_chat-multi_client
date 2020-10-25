@@ -3,7 +3,6 @@ package clientchatapplication;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 
 /**
  * La classe che implemeta le funzionalità relative all'invio dei messaggi al 
@@ -11,12 +10,9 @@ import java.net.Socket;
  * @author Giovanni Ciaranfi
  */
 class ClientSendMessage implements Runnable{
-    Socket socket;
-    BufferedReader input_tastiera;
-    String messaggio;
-    String risposta;
-    DataOutputStream dati_al_server;
-    BufferedReader dati_dal_server;
+    private BufferedReader input_tastiera;
+    private String messaggio;
+    private DataOutputStream dati_al_server;
     /**
      * Costruttore parametrizzato
      * @param c il client dal quale ricevere gli oggetti necessari alla comunicazione
@@ -25,8 +21,6 @@ class ClientSendMessage implements Runnable{
         this.messaggio=c.messaggio;
         this.input_tastiera=c.input_tastiera;
         this.dati_al_server=c.dati_al_server;
-        this.dati_dal_server=c.dati_dal_server;
-        this.risposta=c.risposta;
     }
     /**
      * Il metodo che permette l'invio di messaggi al server in un ciclo infinito
