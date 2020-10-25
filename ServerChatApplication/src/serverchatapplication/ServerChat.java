@@ -81,6 +81,11 @@ public class ServerChat implements Runnable{
         dati_dal_client.close();
         socket_client.close();
     }
+    /**
+     * Il metodo che gestisce la prima comunicazione tra il client e il server, 
+     * il nominativo del client e la connessione agli altri in chat
+     * @throws IOException lanciata in caso di errori nell gestione dei flussi di comunicazione
+     */
     private void initClient() throws IOException{
         System.out.println(Thread.currentThread().getName()+" >> In attesa del nominativo del client.");
         messaggio_client=dati_dal_client.readLine();
@@ -119,6 +124,10 @@ public class ServerChat implements Runnable{
             }
         }
     }
+    /**
+     * Il metodo che comunica agli altri client la disconnessione, se presenti
+     * @throws IOException lanciata in caso di errori nell gestione dei flussi di comunicazione
+     */
     private void comunicaDisconnessione() throws IOException{
         dati_al_client.writeBytes("FINE\n");
         if(client_disponibili.size()>1){
@@ -137,6 +146,10 @@ public class ServerChat implements Runnable{
             });
         }
     }
+    /**
+     * Il metodo che invia il messaggioa agli altri client e comunica in caso di
+     * nessun altro utente connesso
+     */
     private void inviaMessaggio(){
         client_disponibili.forEach((partner) -> {
             if(!partner.equals(this.socket_client)){
