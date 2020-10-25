@@ -54,7 +54,7 @@ public class ServerChat implements Runnable{
      * invia i messaggi agli altri utenti
      * @throws IOException lanciata in caso di errori nell gestione dei flussi di comunicazione
      */
-    public void chat() throws IOException{
+    private void chat() throws IOException{
         System.out.println(Thread.currentThread().getName()+" >> "+"In attesa del nominativo del client.");
         messaggio_client=dati_dal_client.readLine();
         if(messaggio_client==null||messaggio_client.equals("")){
