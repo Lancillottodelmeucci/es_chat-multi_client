@@ -24,7 +24,13 @@ public class MultiServer {
             cmd.start();
             for(;;){
                 System.out.println("Nuovo thread in attesa di un client.");
-                Socket client_socket=server_socket.accept();
+                Socket client_socket;
+                try {
+                    client_socket=server_socket.accept();
+                } catch (IOException e) {
+                    System.err.println(e.getMessage());
+                    client_socket=null;
+                }
                 client_disponibili.add(client_socket);
                 Thread t;
                 ServerChat server_thread=new ServerChat(client_socket,client_disponibili,thread_in_esecuzione);
