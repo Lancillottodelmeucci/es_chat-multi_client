@@ -11,14 +11,12 @@ import java.io.IOException;
  */
 class ClientReceiveMessage implements Runnable{
     private String risposta;
-    private DataOutputStream dati_al_server;
     private BufferedReader dati_dal_server;
     /**
      * Costruttore parametrizzato
      * @param c il client dal quale ricevere gli oggetti necessari alla comunicazione
      */
     public ClientReceiveMessage(Client c){
-        this.dati_al_server=c.dati_al_server;
         this.dati_dal_server=c.dati_dal_server;
         this.risposta=c.risposta;
     }
