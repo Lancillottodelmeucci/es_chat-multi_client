@@ -34,7 +34,7 @@ public class ServerChat implements Runnable{
         }
         catch (IOException e) {
             System.err.println(e.getMessage());
-            System.err.println("Errore nell'istanza dei canali di comunicazione.");
+            System.err.println(Thread.currentThread().getName()+" >> Errore nell'istanza dei canali di comunicazione.");
             System.exit(0);
         }
     }
@@ -44,9 +44,12 @@ public class ServerChat implements Runnable{
     @Override
     public void run() {
         try {
+            initClient();
             chat();
         } catch (IOException e) {
-            e.printStackTrace(System.out);
+            System.err.println(e.getMessage());
+            System.err.println(Thread.currentThread().getName()+" >> Errore durante la comunicazione.");
+            System.exit(0);
         }
     }
     /**
@@ -55,7 +58,31 @@ public class ServerChat implements Runnable{
      * @throws IOException lanciata in caso di errori nell gestione dei flussi di comunicazione
      */
     private void chat() throws IOException{
-        System.out.println(Thread.currentThread().getName()+" >> "+"In attesa del nominativo del client.");
+        for(;;){
+            System.out.println(Thread.currentThread().getName()+" >> In attesa del messaggio da parte del client.");
+            messaggio_client=dati_dal_client.readLine();
+            System.out.println(Thread.currentThread().getName()+" >> Messaggio ricevuto.");
+            if(dati_dal_client==null||messaggio_client.toUpperCase().equals("FINE")){
+                comunicaDisconnessione();
+                break;
+            }
+            else{
+                if(client_disponibili.size()>1){
+                    inviaMessaggio();
+                }
+                else{
+                    dati_al_client.writeBytes("Nessun partner connesso: chiudere la connessione o attendere un partner.\n");
+                }
+            }
+        }
+        client_disponibili.remove(socket_client);
+        System.out.println(Thread.currentThread().getName()+" >> Comunicazione terminata.");
+        dati_al_client.close();
+        dati_dal_client.close();
+        socket_client.close();
+    }
+    private void initClient() throws IOException{
+        System.out.println(Thread.currentThread().getName()+" >> In attesa del nominativo del client.");
         messaggio_client=dati_dal_client.readLine();
         if(messaggio_client==null||messaggio_client.equals("")){
             nome_client=socket_client.getInetAddress().getHostAddress()+":"+socket_client.getPort();
@@ -76,7 +103,7 @@ public class ServerChat implements Runnable{
                     }
                     catch (IOException e) {
                         System.err.println(e.getMessage());
-                        System.err.println(Thread.currentThread().getName()+" >> "+"Errore nella comunicazione col partner del client.");
+                        System.err.println(Thread.currentThread().getName()+" >> Errore nella comunicazione col partner del client.");
                         System.exit(0);
                     }
                 }
@@ -87,64 +114,48 @@ public class ServerChat implements Runnable{
                 dati_al_client.writeBytes("Sei l'unico utente attualemente connesso.\n");
             } catch (IOException e) {
                 System.err.println(e.getMessage());
-                System.err.println(Thread.currentThread().getName()+" >> "+"Errore nella comunicazione col partner del client.");
+                System.err.println(Thread.currentThread().getName()+" >> Errore nella comunicazione col partner del client.");
                 System.exit(0);
             }
         }
-        for(;;){
-            System.out.println(Thread.currentThread().getName()+" >> "+"In attesa del messaggio da parte del client.");
-            messaggio_client=dati_dal_client.readLine();
-            System.out.println(Thread.currentThread().getName()+" >> "+"Messaggio ricevuto.");
-            if(dati_dal_client==null||messaggio_client.toUpperCase().equals("FINE")){
-                dati_al_client.writeBytes("FINE\n");
-                if(client_disponibili.size()>1){
-                    client_disponibili.forEach((partner) -> {
-                        if (!partner.equals(this.socket_client)) {
-                            try {
-                                dati_al_partner=new DataOutputStream(partner.getOutputStream());
-                                dati_al_partner.writeBytes(nome_client+" si e' disconnesso.\n");
-                            }
-                            catch (IOException e) {
-                                System.err.println(e.getMessage());
-                                System.err.println(Thread.currentThread().getName()+" >> "+"Errore nella comunicazione col partner del client.");
-                                System.exit(0);
-                            }
-                        }
-                    });
-                }
-                break;
-            }
-            else{
-                if(client_disponibili.size()>1){
-                    client_disponibili.forEach((partner) -> {
-                        if(!partner.equals(this.socket_client)){
-                        try {
-                            dati_al_partner=new DataOutputStream(partner.getOutputStream());
-                            dati_al_partner.writeBytes("Da: "+nome_client+"\nTesto: "+messaggio_client+'\n');
-                        }
-                        catch (IOException e) {
-                            try {
-                                System.err.println(e.getMessage());
-                                dati_al_client.writeBytes("Errore durante la comunicazione col partner: chiudere la connessione o attendere un partner.\n");
-                            }
-                            catch (IOException ex) {
-                                System.err.println(Thread.currentThread().getName()+" >> "+ex.getMessage());
-                                System.err.println(Thread.currentThread().getName()+" >> "+"Errore nella comunicazione col client.");
-                                System.exit(0);
-                            }
-                        }
+    }
+    private void comunicaDisconnessione() throws IOException{
+        dati_al_client.writeBytes("FINE\n");
+        if(client_disponibili.size()>1){
+            client_disponibili.forEach((partner) -> {
+                if (!partner.equals(this.socket_client)) {
+                    try {
+                        dati_al_partner=new DataOutputStream(partner.getOutputStream());
+                        dati_al_partner.writeBytes(nome_client+" si e' disconnesso.\n");
                     }
-                    });
+                    catch (IOException e) {
+                        System.err.println(e.getMessage());
+                        System.err.println(Thread.currentThread().getName()+" >> Errore nella comunicazione col partner del client.");
+                        System.exit(0);
+                    }
                 }
-                else{
-                    dati_al_client.writeBytes("Nessun partner connesso: chiudere la connessione o attendere un partner.\n");
+            });
+        }
+    }
+    private void inviaMessaggio(){
+        client_disponibili.forEach((partner) -> {
+            if(!partner.equals(this.socket_client)){
+                try {
+                    dati_al_partner=new DataOutputStream(partner.getOutputStream());
+                    dati_al_partner.writeBytes("Da: "+nome_client+"\nTesto: "+messaggio_client+'\n');
+                }
+                catch (IOException e) {
+                    try {
+                        System.err.println(e.getMessage());
+                        dati_al_client.writeBytes("Errore durante la comunicazione col partner: chiudere la connessione o attendere un partner.\n");
+                    }
+                    catch (IOException ex) {
+                        System.err.println(Thread.currentThread().getName()+" >> "+ex.getMessage());
+                        System.err.println(Thread.currentThread().getName()+" >> Errore nella comunicazione col client.");
+                        System.exit(0);
+                    }
                 }
             }
-        }
-        client_disponibili.remove(socket_client);
-        System.out.println(Thread.currentThread().getName()+" >> "+"Comunicazione terminata.");
-        dati_al_client.close();
-        dati_dal_client.close();
-        socket_client.close();
+        });
     }
 }
