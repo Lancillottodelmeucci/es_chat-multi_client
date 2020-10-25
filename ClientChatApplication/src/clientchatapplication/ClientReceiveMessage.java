@@ -29,7 +29,7 @@ class ClientReceiveMessage implements Runnable{
             try {
                 risposta=dati_dal_server.readLine();
                 if(risposta.toUpperCase().equals("FINE")){
-                    return;
+                    System.exit(0);
                 }
                 System.out.println(risposta);
             }

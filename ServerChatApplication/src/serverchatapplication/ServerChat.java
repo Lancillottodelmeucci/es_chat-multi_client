@@ -20,12 +20,15 @@ public class ServerChat implements Runnable{
     private DataOutputStream dati_al_client;
     private ArrayList<Socket> client_disponibili;
     private DataOutputStream dati_al_partner;
+    ArrayList<Thread> thread_in_esecuzione;
     /**
      * Costruttore parametrizzato della classe
      * @param s il socket del client connesso
      * @param s_a la lista dei socket connessi alla chats
+     * @param tie
      */
-    public ServerChat(Socket s,ArrayList<Socket> s_a){
+    public ServerChat(Socket s,ArrayList<Socket> s_a,ArrayList<Thread> tie){
+        thread_in_esecuzione=tie;
         this.client_disponibili=s_a;
         this.socket_client=s;
         try {
@@ -63,6 +66,7 @@ public class ServerChat implements Runnable{
             messaggio_client=dati_dal_client.readLine();
             System.out.println(Thread.currentThread().getName()+" >> Messaggio ricevuto.");
             if(dati_dal_client==null||messaggio_client.toUpperCase().equals("FINE")){
+                thread_in_esecuzione.remove(thread_in_esecuzione.indexOf(Thread.currentThread()));
                 comunicaDisconnessione();
                 break;
             }
