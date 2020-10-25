@@ -24,8 +24,8 @@ public class ServerChat implements Runnable{
     /**
      * Costruttore parametrizzato della classe
      * @param s il socket del client connesso
-     * @param s_a la lista dei socket connessi alla chats
-     * @param tie
+     * @param s_a la lista dei socket connessi alla chat
+     * @param tie la lista dei thread per ogni singolo client
      */
     public ServerChat(Socket s,ArrayList<Socket> s_a,ArrayList<Thread> tie){
         thread_in_esecuzione=tie;

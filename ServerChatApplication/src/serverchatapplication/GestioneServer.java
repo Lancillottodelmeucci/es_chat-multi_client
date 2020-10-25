@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 /**
- *
+ * Classe che gestisce i comandi da eseguire sul server
  * @author Giovanni Ciaranfi
  */
 public class GestioneServer implements Runnable{
@@ -19,12 +19,21 @@ public class GestioneServer implements Runnable{
     private BufferedReader input_tastiera;
     private String comando;
     private String[] comandi=new String[2];
+    /**
+     * Costruttore parametrizzato della classe
+     * @param s il socket del server
+     * @param cd la lista dei socket connessi alla chat
+     * @param tie la lista dei thread per ogni singolo client
+     */
     public GestioneServer(ServerSocket s,ArrayList<Socket> cd, ArrayList<Thread> tie){
         server_socket=s;
         client_disponibili=cd;
         thread_in_esecuzione=tie;
         input_tastiera=new BufferedReader(new InputStreamReader(System.in));
     }
+    /**
+     * Il metodo che gestisce gli input e i metodi dei comandi
+     */
     @Override
     public void run(){
         for(;;){
@@ -74,6 +83,9 @@ public class GestioneServer implements Runnable{
             }
         }
     }
+    /**
+     * Il metodo che mostra la lista dei aprtecipanti alla chat
+     */
     private void mostraPartecipanti(){
         if(thread_in_esecuzione.size()<1){
             System.out.println("Nessun client connesso.");
@@ -84,6 +96,9 @@ public class GestioneServer implements Runnable{
             System.out.println(client_disponibili.get(i).getInetAddress().getHostAddress()+":"+client_disponibili.get(i).getPort());
         }
     }
+    /**
+     * Il metodo che sconnette tutti i client connessi e poi chiude il server
+     */
     private void uscitaEDisconnessione(){
         System.out.println("Chiusura del server e delle connessioni.");
         client_disponibili.forEach((client) -> {
@@ -100,6 +115,10 @@ public class GestioneServer implements Runnable{
         });
         System.exit(0);
     }
+    /**
+     * Il metodo che invia un messaggio a tutti gli utenti della chat, da parte 
+     * del server
+     */
     private void inviaMessaggio(){
         client_disponibili.forEach((client) -> {
             try {
