@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 /**
- * Classe che gestisce i comandi da eseguire sul server
+ * La classe che gestisce i comandi da eseguire sul server
  * @author Giovanni Ciaranfi
  */
 public class GestioneServer implements Runnable{
@@ -22,9 +22,7 @@ public class GestioneServer implements Runnable{
     private String[] comandi=new String[2];
     /**
      * Costruttore parametrizzato della classe
-     * @param s il socket del server
-     * @param cd la lista dei socket connessi alla chat
-     * @param tie la lista dei thread per ogni singolo client
+     * @param ms la classe che contiene le variabili per il multiserver
      */
     public GestioneServer(MultiServer ms){
         server_socket=ms.getServerSocket();

@@ -13,6 +13,9 @@ public class MultiServer implements Runnable{
     private ServerSocket server_socket=null;
     private ArrayList<Socket> client_disponibili=new ArrayList();
     private ArrayList<Thread> thread_in_esecuzione=new ArrayList();
+    /**
+     * Il costruttore della classe che apre il socket del server
+     */
     public MultiServer(){
         try {
             server_socket=new ServerSocket(7777);
@@ -24,8 +27,10 @@ public class MultiServer implements Runnable{
     }
     /**
      * Il metodo che apre la porta sulla quale attivare il servizio della chat, 
-     * e crea il ciclo per ricevere la connessione da parte di più client
+     * qual'ora fosse chiusa, e crea il ciclo per ricevere la connessione da 
+     * parte di più client
      */
+    @Override
     public void run(){
         if(server_socket.isClosed()){
             try {
@@ -54,6 +59,9 @@ public class MultiServer implements Runnable{
             t.start();
         }
     }
+    /**
+     * Il metodo che chiude il socket del server
+     */
     public void chiudi(){
         try {
             server_socket.close();
@@ -64,12 +72,24 @@ public class MultiServer implements Runnable{
             System.exit(0);
         }
     }
+    /**
+     * 
+     * @return il socket del server
+     */
     public ServerSocket getServerSocket(){
         return (server_socket);
     }
+    /**
+     * 
+     * @return la lista dei thread che gestiscono i client
+     */
     public ArrayList<Thread> getThreads(){
         return (thread_in_esecuzione);
     }
+    /**
+     * 
+     * @return la lista dei socket dei client
+     */
     public ArrayList<Socket> getSockets(){
         return (client_disponibili);
     }
