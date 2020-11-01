@@ -13,6 +13,7 @@ import java.util.ArrayList;
  * @author Giovanni Ciaranfi
  */
 public class GestioneServer implements Runnable{
+    private MultiServer multi_server;
     private final ServerSocket server_socket;
     private ArrayList<Socket> client_disponibili;
     private ArrayList<Thread> thread_in_esecuzione;
@@ -25,11 +26,12 @@ public class GestioneServer implements Runnable{
      * @param cd la lista dei socket connessi alla chat
      * @param tie la lista dei thread per ogni singolo client
      */
-    public GestioneServer(ServerSocket s,ArrayList<Socket> cd, ArrayList<Thread> tie){
-        server_socket=s;
-        client_disponibili=cd;
-        thread_in_esecuzione=tie;
+    public GestioneServer(MultiServer ms){
+        server_socket=ms.getServerSocket();
+        client_disponibili=ms.getSockets();
+        thread_in_esecuzione=ms.getThreads();
         input_tastiera=new BufferedReader(new InputStreamReader(System.in));
+        multi_server=ms;
     }
     /**
      * Il metodo che gestisce gli input e i metodi dei comandi
@@ -55,17 +57,25 @@ public class GestioneServer implements Runnable{
                     mostraPartecipanti();
                     break;
                 case "close":
-                    if(server_socket.isClosed()){
+                    if(multi_server.getServerSocket().isClosed()){
                         System.out.println("Server gia' chiuso alle nuove connessioni.");
                         break;
                     }
                     try {
-                        server_socket.close();
+                        multi_server.getServerSocket().close();
                     } catch (IOException e) {
                         System.err.println(e.getMessage());
                         System.err.println("Errore nella chiusura del server.");
                         System.exit(0);
                     }
+                    break;
+                case "open":
+                    if(!multi_server.getServerSocket().isClosed()){
+                        System.out.println("Server gia' aperto alle nuove connessioni.");
+                        break;
+                    }
+                    Thread t=new Thread(multi_server);
+                    t.start(); 
                     break;
                 case  "send":
                     inviaMessaggio();
@@ -113,6 +123,7 @@ public class GestioneServer implements Runnable{
                 System.exit(0);
             }
         });
+        multi_server.chiudi();
         System.exit(0);
     }
     /**
