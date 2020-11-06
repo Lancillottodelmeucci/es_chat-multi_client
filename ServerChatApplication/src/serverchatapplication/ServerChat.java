@@ -52,7 +52,9 @@ public class ServerChat implements Runnable{
         } catch (IOException e) {
             System.err.println(e.getMessage());
             System.err.println(Thread.currentThread().getName()+" >> Errore durante la comunicazione.");
-            System.exit(0);
+            thread_in_esecuzione.remove(thread_in_esecuzione.indexOf(Thread.currentThread()));
+            client_disponibili.remove(socket_client);
+            return;
         }
     }
     /**
