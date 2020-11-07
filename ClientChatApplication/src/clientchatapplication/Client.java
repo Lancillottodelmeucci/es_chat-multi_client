@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import javax.swing.JPanel;
 
 /**
  * La classe che gestisce i thread per la comunicazione col server e che 
@@ -54,11 +55,11 @@ public class Client {
      * Il metodo che lancia i thread per l'invio e la ricezione dei messaggi
      */
     public void comunica(){
-        c_s_m=new ClientSendMessage(this);
-        c_r_m=new ClientReceiveMessage(this);
-        Thread t_s=new Thread(c_s_m);
-        Thread t_r=new Thread(c_r_m);
-        t_r.start();
-        t_s.start();
+//        c_s_m=new ClientSendMessage(this);
+//        c_r_m=new ClientReceiveMessage(this,new JPanel());
+//        Thread t_s=new Thread(c_s_m);
+//        Thread t_r=new Thread(c_r_m);
+//        t_r.start();
+//        t_s.start();
     }
 }

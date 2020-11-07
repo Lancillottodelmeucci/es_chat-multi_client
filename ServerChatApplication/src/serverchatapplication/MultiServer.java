@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * La classe che permette a più client di connettersi alla chat
@@ -13,6 +14,7 @@ public class MultiServer implements Runnable{
     private ServerSocket server_socket=null;
     private ArrayList<Socket> client_disponibili=new ArrayList();
     private ArrayList<Thread> thread_in_esecuzione=new ArrayList();
+    private HashMap<String,Connessioni> utenti_connessi=new HashMap();
     /**
      * Il costruttore della classe che apre il socket del server
      */
@@ -53,9 +55,11 @@ public class MultiServer implements Runnable{
             }
             client_disponibili.add(client_socket);
             Thread t;
-            ServerChat server_thread=new ServerChat(client_socket,client_disponibili,thread_in_esecuzione);
+            ServerChat server_thread=new ServerChat(client_socket,client_disponibili,thread_in_esecuzione,utenti_connessi);
             t=new Thread(server_thread);
             thread_in_esecuzione.add(t);
+            Connessioni c=new Connessioni(client_socket, t);
+            utenti_connessi.put(t.getName(), c);
             t.start();
         }
     }

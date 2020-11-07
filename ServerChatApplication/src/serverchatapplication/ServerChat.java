@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Classe che implementa la gestione del processo server dedicato ad ogni client
@@ -20,16 +21,18 @@ public class ServerChat implements Runnable{
     private DataOutputStream dati_al_client;
     private ArrayList<Socket> client_disponibili;
     private DataOutputStream dati_al_partner;
-    ArrayList<Thread> thread_in_esecuzione;
+    private ArrayList<Thread> thread_in_esecuzione;
+    private HashMap<String,Connessioni> utenti_connessi;
     /**
      * Costruttore parametrizzato della classe
      * @param s il socket del client connesso
      * @param s_a la lista dei socket connessi alla chat
      * @param tie la lista dei thread per ogni singolo client
      */
-    public ServerChat(Socket s,ArrayList<Socket> s_a,ArrayList<Thread> tie){
+    public ServerChat(Socket s,ArrayList<Socket> s_a,ArrayList<Thread> tie,HashMap<String,Connessioni> uc){
         thread_in_esecuzione=tie;
         this.client_disponibili=s_a;
+        utenti_connessi=uc;
         this.socket_client=s;
         try {
             dati_dal_client=new BufferedReader(new InputStreamReader(socket_client.getInputStream()));
@@ -82,6 +85,7 @@ public class ServerChat implements Runnable{
             }
         }
         client_disponibili.remove(socket_client);
+        utenti_connessi.remove(Thread.currentThread().getName());
         System.out.println(Thread.currentThread().getName()+" >> Comunicazione terminata.");
         dati_al_client.close();
         dati_dal_client.close();
@@ -93,16 +97,25 @@ public class ServerChat implements Runnable{
      * @throws IOException lanciata in caso di errori nell gestione dei flussi di comunicazione
      */
     private void initClient() throws IOException{
+        Connessioni c=utenti_connessi.get(Thread.currentThread().getName());;
         System.out.println(Thread.currentThread().getName()+" >> In attesa del nominativo del client.");
         messaggio_client=dati_dal_client.readLine();
+        while(!nomeCorretto(messaggio_client)){
+            dati_al_client.writeBytes("Nome utente gia' esistente, inserirne uno nuovo:\n");
+            messaggio_client=dati_dal_client.readLine();
+        }
+        dati_al_client.writeBytes("OK\n");
         if(messaggio_client==null||messaggio_client.equals("")){
             nome_client=socket_client.getInetAddress().getHostAddress()+":"+socket_client.getPort();
         }
         else{
             nome_client=messaggio_client;
         }
+        dati_al_client.writeBytes(nome_client+"\n");
         System.out.print(Thread.currentThread().getName()+" -> ");
+        utenti_connessi.remove(Thread.currentThread().getName());
         Thread.currentThread().setName("Thread."+nome_client);
+        utenti_connessi.put(Thread.currentThread().getName(), c);
         System.out.println(Thread.currentThread().getName());
         System.out.println(Thread.currentThread().getName()+" >> connesso.");
         if(client_disponibili.size()>1){
@@ -129,6 +142,14 @@ public class ServerChat implements Runnable{
                 System.exit(0);
             }
         }
+    }
+    private boolean nomeCorretto(String n){
+        for (Thread t : thread_in_esecuzione) {
+            if(t.getName().substring(7).equals(n)){
+                return(false);
+            }
+        }
+        return (true);
     }
     /**
      * Il metodo che comunica agli altri client la disconnessione, se presenti
