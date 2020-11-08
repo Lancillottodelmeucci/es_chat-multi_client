@@ -103,7 +103,7 @@ public class ServerChat implements Runnable{
      * @throws IOException lanciata in caso di errori nell gestione dei flussi di comunicazione
      */
     private void initClient() throws IOException{
-        Connessioni c=utenti_connessi.get(Thread.currentThread().getName());;
+        Connessioni c=new Connessioni(socket_client, Thread.currentThread());//utenti_connessi.get(Thread.currentThread().getName());;
         System.out.println(Thread.currentThread().getName()+" >> In attesa del nominativo del client.");
         messaggio_client=dati_dal_client.readLine();
         while(!nomeCorretto(messaggio_client)){
@@ -119,7 +119,7 @@ public class ServerChat implements Runnable{
         }
         dati_al_client.writeBytes(nome_client+"\n");
         System.out.print(Thread.currentThread().getName()+" -> ");
-        utenti_connessi.remove(Thread.currentThread().getName());
+        //utenti_connessi.remove(Thread.currentThread().getName());
         String testo="";
         if(!utenti_connessi.isEmpty()){
             Object[] utenti=utenti_connessi.keySet().toArray();
@@ -131,9 +131,12 @@ public class ServerChat implements Runnable{
         }
         dati_al_client.writeBytes(new Messaggio(testo).toString()+"\n");
         Thread.currentThread().setName("Thread."+nome_client);
-        utenti_connessi.put(nome_client, c);
+        //utenti_connessi.put(nome_client, c);
         System.out.println(Thread.currentThread().getName());
         System.out.println(Thread.currentThread().getName()+" >> connesso.");
+        client_disponibili.add(socket_client);
+        thread_in_esecuzione.add(Thread.currentThread());
+        utenti_connessi.put(nome_client, c);
         if(client_disponibili.size()>1){
             client_disponibili.forEach((partner) -> {
                 if (!partner.equals(this.socket_client)) {

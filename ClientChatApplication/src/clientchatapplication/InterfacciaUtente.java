@@ -189,10 +189,7 @@ public class InterfacciaUtente extends JFrame{
         messaggio=Messaggio.reBuild(risposta).testo;
         membri=new JList<>(dlm);
         SwingUtilities.updateComponentTreeUI(membriInChat);
-        if(messaggio==null||messaggio.equals("")){
-            
-        }
-        else{
+        if(messaggio!=null&&!messaggio.equals("")){
             String[] utenti=messaggio.split(Messaggio.SPLIT_MEMBERS);
             //membri.setListData(utenti);
             for (String u : utenti) {
