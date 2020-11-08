@@ -75,28 +75,28 @@ class ClientReceiveMessage implements Runnable{
                 dlm.addElement(m.mittente);
                 break;
             default:
-                l=new JLabel("<html>"+m.testo+"</html>");
+                l=new JLabel("<html>"+(m.mittente.equals("")?"":"Da "+m.mittente+": ")+m.testo+"</html>");
                 break;
         }
-        l.setPreferredSize(new Dimension(550, 25));
+        l.setPreferredSize(new Dimension(625, 25));
         l.setHorizontalAlignment(2);
-        l.setBorder(new LineBorder(Color.WHITE));
-            JPanel appo;//=pannelliChat.get(multiChat.getTitleAt(multiChat.getSelectedIndex()));
-            if(m.destinatario.equals(nome)){
-                if(!pannelliChat.containsKey(m.mittente)){
-                    creaChatPrivata(m.mittente);
-                }
-                appo=pannelliChat.get(m.mittente);
+        //l.setBorder(new LineBorder(Color.WHITE));
+        JPanel appo;//=pannelliChat.get(multiChat.getTitleAt(multiChat.getSelectedIndex()));
+        if(m.destinatario.equals(nome)||m.destinatario.equals("Invia a tutti")){
+            if(!pannelliChat.containsKey(m.mittente)){
+                creaChatPrivata(m.mittente);
             }
-            else if(m.mittente==null||m.mittente.equals("")){
-                appo=pannelliChat.get("mainGroupChat");
-            }
-            else{
-                appo=pannelliChat.get("mainGroupChat");
-            }
-            appo.add(l);
-            appo.setPreferredSize(new Dimension(500, chat.getHeight()+25));
-            SwingUtilities.updateComponentTreeUI(appo);
+            appo=pannelliChat.get(m.mittente);
+        }
+        else if(m.mittente==null||m.mittente.equals("")){
+            appo=pannelliChat.get("mainGroupChat");
+        }
+        else{
+            appo=pannelliChat.get("mainGroupChat");
+        }
+        appo.add(l);
+        appo.setPreferredSize(new Dimension(500, chat.getHeight()+25));
+        SwingUtilities.updateComponentTreeUI(appo);
 //        chat.add(l);
 //        chat.setPreferredSize(new Dimension(500, chat.getHeight()+25));
 //        SwingUtilities.updateComponentTreeUI(chat);
@@ -108,10 +108,11 @@ class ClientReceiveMessage implements Runnable{
         pannelliChat.put(u, c);
         JScrollPane s;
         s=new JScrollPane(c);
-        s.setBounds(80, 0, 570, 455);
+        s.setBounds(0, 0, 570, 455);
         s.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
         s.setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_AS_NEEDED);
         s.setWheelScrollingEnabled(true);
+//        s.setPreferredSize(new Dimension(570, 455));
         multiChat.add(u,s);
         SwingUtilities.updateComponentTreeUI(multiChat);
     }

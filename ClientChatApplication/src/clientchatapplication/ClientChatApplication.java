@@ -13,6 +13,8 @@ public class ClientChatApplication {
 //        Client c=new Client();
 //        c.connetti();
 //        c.comunica();
-        InterfacciaUtente iu=new InterfacciaUtente();
+//        for (int i = 0; i < 50; i++) {
+            InterfacciaUtente iu=new InterfacciaUtente();
+//        }
     }
 }

@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import static javax.swing.ScrollPaneConstants.*;
 import javax.swing.border.LineBorder;
+import javax.swing.plaf.TabbedPaneUI;
 
 /**
  *
@@ -23,7 +24,7 @@ public class InterfacciaUtente extends JFrame{
     private JPanel invioMessaggi;
     private JTextField inserimento;
     private JButton invio;
-    private JPanel membriInChat;
+    private JScrollPane membriInChat;
     private JScrollPane scrollChat;
     private JTabbedPane multiChat;
     private HashMap<String,JPanel> pannelliChat;
@@ -49,7 +50,7 @@ public class InterfacciaUtente extends JFrame{
         //this.add(mainPanel);
         mainPanel.setBackground(Color.CYAN);
         multiChat=new JTabbedPane();
-        multiChat.setTabPlacement(JTabbedPane.LEFT);
+        multiChat.setTabPlacement(JTabbedPane.TOP);
         multiChat.setBounds(0, 0, 650, 455);
 //        chatDisponibili=new JPanel(null);
 //        chatDisponibili.setBounds(0, 0, 80, 500);
@@ -62,25 +63,26 @@ public class InterfacciaUtente extends JFrame{
         chat.setBackground(Color.PINK);
         pannelliChat.put("mainGroupChat", chat);
         scrollChat=new JScrollPane(chat);
-        scrollChat.setBounds(80, 0, 570, 455);
+        scrollChat.setBounds(0, 0, 570, 455);
 //        scrollChat.setPreferredSize(new Dimension(570, 455));
         scrollChat.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
 //        scrollChat.createVerticalScrollBar();
         scrollChat.setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollChat.setWheelScrollingEnabled(true);
         multiChat.add("mainGroupChat",scrollChat);
+        multiChat.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 //        mainPanel.add(scrollChat);
         invioMessaggi=new JPanel(null);
         invioMessaggi.setBackground(Color.GREEN);
-        invioMessaggi.setBounds(80, 455, 570, 45);
+        invioMessaggi.setBounds(0, 455, 650, 45);
         //JLabel inserimento=new JLabel("Scrivi qui...");
         inserimento=new JTextField();
-        inserimento.setBounds(0, 0, 500, 45);
+        inserimento.setBounds(0, 0, 580, 45);
         //inserimento.setBackground(Color.RED);
         inserimento.setEnabled(false);
         invioMessaggi.add(inserimento);
         invio=new JButton("Invia");
-        invio.setBounds(500, 0, 70, 45);
+        invio.setBounds(580, 0, 70, 45);
         invio.setBackground(Color.ORANGE);
         invio.addActionListener((ActionEvent ev) -> {
             messaggio=inserimento.getText();
@@ -88,10 +90,11 @@ public class InterfacciaUtente extends JFrame{
                 return;
             }
             inserimento.setText("");
+            inserimento.requestFocus();
             try {
                 JLabel l=new JLabel("<html>"+messaggio+"</html>");
-                l.setBorder(new LineBorder(Color.BLACK));
-                l.setPreferredSize(new Dimension(550, 25));
+                //l.setBorder(new LineBorder(Color.BLACK));
+                l.setPreferredSize(new Dimension(625, 25));
                 l.setHorizontalAlignment(4);
                 JPanel appo=pannelliChat.get(multiChat.getTitleAt(multiChat.getSelectedIndex()));
                 appo.add(l);
@@ -108,9 +111,11 @@ public class InterfacciaUtente extends JFrame{
         invio.setEnabled(false);
         invioMessaggi.add(invio);
         mainPanel.add(invioMessaggi);
-        membriInChat=new JPanel(null);
+        membriInChat=new JScrollPane(null);
         membriInChat.setBounds(650, 0, 150, 500);
         membriInChat.setBackground(Color.YELLOW);
+//        membriInChat.setVerticalScrollBar(new JScrollBar(JScrollBar.VERTICAL));
+//        membriInChat.setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_AS_NEEDED);
         mainPanel.add(membriInChat);
         initAccess();
         this.setVisible(true);
@@ -158,6 +163,7 @@ public class InterfacciaUtente extends JFrame{
                 System.exit(0);
             }
         });
+        input.requestFocus();
         accesso.add(send);
     }
     private void initSocket(){
@@ -199,6 +205,7 @@ public class InterfacciaUtente extends JFrame{
         risposta=dati_dal_server.readLine();
         messaggio=Messaggio.reBuild(risposta).testo;
         membri=new JList<>(dlm);
+        membri.setLayoutOrientation(JList.VERTICAL);
         SwingUtilities.updateComponentTreeUI(membriInChat);
         if(messaggio!=null&&!messaggio.equals("")){
             String[] utenti=messaggio.split(Messaggio.SPLIT_MEMBERS);
@@ -213,12 +220,14 @@ public class InterfacciaUtente extends JFrame{
                 if (evt.getClickCount() == 2) {
                     // Double-click detected
                     int i = l.locationToIndex(evt.getPoint());
-                    creaChatPrivata(dlm.get(i));
+                    if(!pannelliChat.containsKey(dlm.get(i))){
+                        creaChatPrivata(dlm.get(i));
+                    }
                 }
             }
         });
         membri.setBounds(0, 0, 150, 500);
-        membriInChat.add(membri);
+        membriInChat.setViewportView(membri);
         SwingUtilities.updateComponentTreeUI(membriInChat);
     }
     public void creaChatPrivata(String u){
@@ -228,10 +237,13 @@ public class InterfacciaUtente extends JFrame{
         pannelliChat.put(u, c);
         JScrollPane s;
         s=new JScrollPane(c);
-        s.setBounds(80, 0, 570, 455);
+        s.setBounds(0, 0, 570, 455);
         s.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
         s.setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_AS_NEEDED);
         s.setWheelScrollingEnabled(true);
+//        s.setPreferredSize(new Dimension(570, 455));
+//        JLabel lab=new JLabel(u);
+//        lab.setPreferredSize(new Dimension(20, 20));
         multiChat.add(u,s);
         SwingUtilities.updateComponentTreeUI(multiChat);
     }

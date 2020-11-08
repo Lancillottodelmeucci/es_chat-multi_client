@@ -120,15 +120,15 @@ public class ServerChat implements Runnable{
         dati_al_client.writeBytes(nome_client+"\n");
         System.out.print(Thread.currentThread().getName()+" -> ");
         //utenti_connessi.remove(Thread.currentThread().getName());
-        String testo="";
+        String testo="Invia a tutti"+Messaggio.SPLIT_MEMBERS;
         if(!utenti_connessi.isEmpty()){
             Object[] utenti=utenti_connessi.keySet().toArray();
             for (Object u : utenti) {
                 String s=(String)u;
                 testo+=s+Messaggio.SPLIT_MEMBERS;
             }
-            testo=testo.substring(0, testo.lastIndexOf(Messaggio.SPLIT_MEMBERS));
         }
+        testo=testo.substring(0, testo.lastIndexOf(Messaggio.SPLIT_MEMBERS));
         dati_al_client.writeBytes(new Messaggio(testo).toString()+"\n");
         Thread.currentThread().setName("Thread."+nome_client);
         //utenti_connessi.put(nome_client, c);
@@ -168,6 +168,9 @@ public class ServerChat implements Runnable{
                 return(false);
             }
         }
+        if(n.equals("mainGroupChat")){
+            return (false);
+        }
         return (true);
     }
     /**
@@ -197,7 +200,7 @@ public class ServerChat implements Runnable{
      */
     private void inviaMessaggio(){
         utenti_connessi.forEach((k, c) -> {
-            if(!k.equals(nome_client)&&(messaggio.destinatario.equals("mainGroupChat")||k.equals(messaggio.destinatario))){
+            if(!k.equals(nome_client)&&(messaggio.destinatario.equals("mainGroupChat")||k.equals(messaggio.destinatario)||messaggio.destinatario.equals("Invia a tutti"))){
                 try {
                     dati_al_partner=new DataOutputStream(c.getSocket().getOutputStream());
                     dati_al_partner.writeBytes(messaggio.toString()+'\n');
