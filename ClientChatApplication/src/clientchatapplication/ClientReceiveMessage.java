@@ -1,18 +1,14 @@
 package clientchatapplication;
 
 import java.awt.Color;
-import java.awt.Component;
-import static java.awt.Component.*;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Rectangle;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
 import javax.swing.*;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
-import javax.swing.border.LineBorder;
 
 /**
  * La classe che implemeta le funzionalità relative alla ricezione dei messaggi 
@@ -80,8 +76,7 @@ class ClientReceiveMessage implements Runnable{
         }
         l.setPreferredSize(new Dimension(625, 25));
         l.setHorizontalAlignment(2);
-        //l.setBorder(new LineBorder(Color.WHITE));
-        JPanel appo;//=pannelliChat.get(multiChat.getTitleAt(multiChat.getSelectedIndex()));
+        JPanel appo;
         if(m.destinatario.equals(nome)||m.destinatario.equals("Invia a tutti")){
             if(!pannelliChat.containsKey(m.mittente)){
                 creaChatPrivata(m.mittente);
@@ -97,9 +92,6 @@ class ClientReceiveMessage implements Runnable{
         appo.add(l);
         appo.setPreferredSize(new Dimension(500, chat.getHeight()+25));
         SwingUtilities.updateComponentTreeUI(appo);
-//        chat.add(l);
-//        chat.setPreferredSize(new Dimension(500, chat.getHeight()+25));
-//        SwingUtilities.updateComponentTreeUI(chat);
     }
     public void creaChatPrivata(String u){
         JPanel c;
@@ -112,7 +104,6 @@ class ClientReceiveMessage implements Runnable{
         s.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
         s.setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_AS_NEEDED);
         s.setWheelScrollingEnabled(true);
-//        s.setPreferredSize(new Dimension(570, 455));
         multiChat.add(u,s);
         SwingUtilities.updateComponentTreeUI(multiChat);
     }

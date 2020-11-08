@@ -53,13 +53,10 @@ public class MultiServer implements Runnable{
                 client_socket=null;
                 break;
             }
-            //client_disponibili.add(client_socket);
             Thread t;
             ServerChat server_thread=new ServerChat(client_socket,client_disponibili,thread_in_esecuzione,utenti_connessi);
             t=new Thread(server_thread);
-            //thread_in_esecuzione.add(t);
             Connessioni c=new Connessioni(client_socket, t);
-            //utenti_connessi.put(t.getName(), c);
             t.start();
         }
     }

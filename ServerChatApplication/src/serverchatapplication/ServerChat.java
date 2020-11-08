@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 
 /**
  * Classe che implementa la gestione del processo server dedicato ad ogni client
@@ -119,7 +118,6 @@ public class ServerChat implements Runnable{
         }
         dati_al_client.writeBytes(nome_client+"\n");
         System.out.print(Thread.currentThread().getName()+" -> ");
-        //utenti_connessi.remove(Thread.currentThread().getName());
         String testo="Invia a tutti"+Messaggio.SPLIT_MEMBERS;
         if(!utenti_connessi.isEmpty()){
             Object[] utenti=utenti_connessi.keySet().toArray();
@@ -131,7 +129,6 @@ public class ServerChat implements Runnable{
         testo=testo.substring(0, testo.lastIndexOf(Messaggio.SPLIT_MEMBERS));
         dati_al_client.writeBytes(new Messaggio(testo).toString()+"\n");
         Thread.currentThread().setName("Thread."+nome_client);
-        //utenti_connessi.put(nome_client, c);
         System.out.println(Thread.currentThread().getName());
         System.out.println(Thread.currentThread().getName()+" >> connesso.");
         client_disponibili.add(socket_client);
@@ -218,10 +215,5 @@ public class ServerChat implements Runnable{
                 }
             }
         });
-//        client_disponibili.forEach((partner) -> {
-//            if(!partner.equals(this.socket_client)){
-//                
-//            }
-//        });
     }
 }
