@@ -32,6 +32,7 @@ public class InterfacciaUtente extends JFrame{
     public String risposta;
     public DataOutputStream dati_al_server;
     public BufferedReader dati_dal_server;
+    public String nome;
     public InterfacciaUtente(){
         initSocket();
         initComponent();
@@ -47,9 +48,9 @@ public class InterfacciaUtente extends JFrame{
         chatDisponibili.setBounds(0, 0, 80, 500);
         chatDisponibili.setBackground(Color.GRAY);
         mainPanel.add(chatDisponibili);
-        chat=new JPanel(new FlowLayout(FlowLayout.LEFT));
+        chat=new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 //        chat.setBounds(new Rectangle(570, 455));
-        chat.setPreferredSize(new Dimension(500, 0));
+//        chat.setPreferredSize(new Dimension(500, 0));
         chat.setBackground(Color.PINK);
         scrollChat=new JScrollPane(chat);
         scrollChat.setBounds(80, 0, 570, 455);
@@ -57,12 +58,13 @@ public class InterfacciaUtente extends JFrame{
         scrollChat.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
 //        scrollChat.createVerticalScrollBar();
         scrollChat.setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollChat.setWheelScrollingEnabled(true);
         mainPanel.add(scrollChat);
         invioMessaggi=new JPanel(null);
         invioMessaggi.setBackground(Color.GREEN);
         invioMessaggi.setBounds(80, 455, 570, 45);
         //JLabel inserimento=new JLabel("Scrivi qui...");
-        inserimento=new JTextField("Scrivi qui...");
+        inserimento=new JTextField();
         inserimento.setBounds(0, 0, 500, 45);
         //inserimento.setBackground(Color.RED);
         inserimento.setEnabled(false);
@@ -72,15 +74,20 @@ public class InterfacciaUtente extends JFrame{
         invio.setBackground(Color.ORANGE);
         invio.addActionListener((ActionEvent ev) -> {
             messaggio=inserimento.getText();
+            if(messaggio==null||messaggio.equals("")){
+                return;
+            }
             inserimento.setText("");
             try {
-                dati_al_server.writeBytes(messaggio+"\n");
-                JLabel l=new JLabel(messaggio);
+                JLabel l=new JLabel("<html>"+messaggio+"</html>");
                 l.setBorder(new LineBorder(Color.BLACK));
-                l.setPreferredSize(new Dimension(500, 30));
+                l.setPreferredSize(new Dimension(550, 25));
                 l.setHorizontalAlignment(4);
                 chat.add(l);
-                chat.setPreferredSize(new Dimension(chat.getWidth(), chat.getHeight()+30));
+                chat.setPreferredSize(new Dimension(500, chat.getHeight()+25));
+                SwingUtilities.updateComponentTreeUI(chat);
+                //scrollChat.getVerticalScrollBar().setValue(-1);
+                dati_al_server.writeBytes(new Messaggio(messaggio, nome, "mainGroupChat", Messaggio.MESSAGGIO_CLIENT).toString()+"\n");
             } catch (IOException e) {
                 System.err.println(e.getMessage());
                 System.err.println("Errore durante la comunicazione.");
@@ -124,19 +131,21 @@ public class InterfacciaUtente extends JFrame{
                 }
                 else{
                     rispServ=dati_dal_server.readLine();
+                    nome=rispServ;
                     this.remove(accesso);
                     inserimento.setEnabled(true);
                     invio.setEnabled(true);
+                    fetchClients();
                     this.add(mainPanel);
                     this.setTitle("Connesso come "+rispServ);
                     SwingUtilities.updateComponentTreeUI(this);
+                    startProcesses();
                 }
             } catch (IOException e) {
                 System.err.println(e.getMessage());
                 System.err.println("Errore durante la comunicazione.");
                 System.exit(0);
             }
-            startProcesses();
         });
         accesso.add(send);
     }
@@ -159,17 +168,39 @@ public class InterfacciaUtente extends JFrame{
     }
     private void startProcesses(){
         //ClientSendMessage c_s_m=new ClientSendMessage();
-        ClientReceiveMessage c_r_m=new ClientReceiveMessage(dati_dal_server,chat);
+        ClientReceiveMessage c_r_m=new ClientReceiveMessage(dati_dal_server,chat,dlm);
         //Thread t_s=new Thread(c_s_m);
         Thread t_r=new Thread(c_r_m);
         t_r.start();
         //t_s.start();
-        RefreshFrame r_f=new RefreshFrame(chat);
-        Thread t_refresh=new Thread(r_f);
+//        RefreshFrame r_f=new RefreshFrame(chat);
+//        Thread t_refresh=new Thread(r_f);
         /*new Thread(() -> {
             this.setVisible(false);
             this.setVisible(true);
         });*/
-        t_refresh.start();
+        //t_refresh.start();
+    }
+    DefaultListModel<String> dlm=new DefaultListModel<>();
+    JList<String> membri;
+    public void fetchClients() throws IOException{
+        //dati_al_server.writeBytes(new Messaggio(nome,Messaggio.CLIENTS_FETCH).toString()+"\n");
+        risposta=dati_dal_server.readLine();
+        messaggio=Messaggio.reBuild(risposta).testo;
+        membri=new JList<>(dlm);
+        SwingUtilities.updateComponentTreeUI(membriInChat);
+        if(messaggio==null||messaggio.equals("")){
+            
+        }
+        else{
+            String[] utenti=messaggio.split(Messaggio.SPLIT_MEMBERS);
+            //membri.setListData(utenti);
+            for (String u : utenti) {
+                dlm.addElement(u);
+            }
+        }
+        membri.setBounds(0, 0, 150, 500);
+        membriInChat.add(membri);
+        SwingUtilities.updateComponentTreeUI(membriInChat);
     }
 }

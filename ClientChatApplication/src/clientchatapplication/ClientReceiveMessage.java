@@ -1,6 +1,7 @@
 package clientchatapplication;
 
 import java.awt.Color;
+import java.awt.Component;
 import static java.awt.Component.*;
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -18,13 +19,17 @@ class ClientReceiveMessage implements Runnable{
     private String risposta;
     private BufferedReader dati_dal_server;
     private JPanel chat;
+    private Messaggio messaggio;
+    private JList<String> membri;
+    DefaultListModel<String> dlm;
     /**
      * Costruttore parametrizzato
      * @param c il client dal quale ricevere gli oggetti necessari alla comunicazione
      */
-    public ClientReceiveMessage(BufferedReader br,JPanel p){
+    public ClientReceiveMessage(BufferedReader br,JPanel p,DefaultListModel<String> d){
         dati_dal_server=br;
         chat=p;
+        dlm=d;
     }
     /**
      * Il metodo che permette la ricezione dei messaggi dal server e dagli altri
@@ -35,10 +40,11 @@ class ClientReceiveMessage implements Runnable{
         for(;;){
             try {
                 risposta=dati_dal_server.readLine();
-                if(risposta.toUpperCase().equals("FINE")){
+                messaggio=Messaggio.reBuild(risposta);
+                if(messaggio.testo.toUpperCase().equals("FINE")){
                     System.exit(0);
                 }
-                visualizzaMessaggio(risposta);
+                visualizzaMessaggio(messaggio);
             }
             catch (IOException e) {
                 System.err.println(e.getMessage());
@@ -47,12 +53,26 @@ class ClientReceiveMessage implements Runnable{
             }
         }
     }
-    public void visualizzaMessaggio(String m){
-        JLabel l=new JLabel(m);
-        l.setPreferredSize(new Dimension(500, 30));
+    public void visualizzaMessaggio(Messaggio m){
+        JLabel l;
+        switch(m.tipo){
+            case Messaggio.DISCONNESSIONE:
+                l=new JLabel("<html>"+m.mittente+" si e' disconnesso</html>");
+                dlm.removeElement(m.mittente);
+                break;
+            case Messaggio.CONNESSIONE:
+                l=new JLabel("<html>"+m.mittente+" si e' connesso.</html>");
+                dlm.addElement(m.mittente);
+                break;
+            default:
+                l=new JLabel("<html>"+m.testo+"</html>");
+                break;
+        }
+        l.setPreferredSize(new Dimension(550, 25));
         l.setHorizontalAlignment(2);
-                l.setBorder(new LineBorder(Color.WHITE));
+        l.setBorder(new LineBorder(Color.WHITE));
         chat.add(l);
-        chat.setPreferredSize(new Dimension(500, chat.getHeight()+30));
+        chat.setPreferredSize(new Dimension(500, chat.getHeight()+25));
+        SwingUtilities.updateComponentTreeUI(chat);
     }
 }

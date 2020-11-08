@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Classe che implementa la gestione del processo server dedicato ad ogni client
@@ -16,6 +17,7 @@ import java.util.HashMap;
 public class ServerChat implements Runnable{
     private Socket socket_client=null;
     private String messaggio_client=null;
+    private Messaggio messaggio;
     private String nome_client=null;
     private BufferedReader dati_dal_client;
     private DataOutputStream dati_al_client;
@@ -57,7 +59,8 @@ public class ServerChat implements Runnable{
             System.err.println(Thread.currentThread().getName()+" >> Errore durante la comunicazione.");
             thread_in_esecuzione.remove(thread_in_esecuzione.indexOf(Thread.currentThread()));
             client_disponibili.remove(socket_client);
-            return;
+            utenti_connessi.remove(nome_client);
+            comunicaDisconnessione();
         }
     }
     /**
@@ -69,9 +72,12 @@ public class ServerChat implements Runnable{
         for(;;){
             System.out.println(Thread.currentThread().getName()+" >> In attesa del messaggio da parte del client.");
             messaggio_client=dati_dal_client.readLine();
+            messaggio=Messaggio.reBuild(messaggio_client);
             System.out.println(Thread.currentThread().getName()+" >> Messaggio ricevuto.");
-            if(dati_dal_client==null||messaggio_client.toUpperCase().equals("FINE")){
+            if(dati_dal_client==null||messaggio.testo.toUpperCase().equals("FINE")){
                 thread_in_esecuzione.remove(thread_in_esecuzione.indexOf(Thread.currentThread()));
+                utenti_connessi.remove(nome_client);
+                dati_al_client.writeBytes(new Messaggio("FINE").toString()+"\n");
                 comunicaDisconnessione();
                 break;
             }
@@ -80,7 +86,7 @@ public class ServerChat implements Runnable{
                     inviaMessaggio();
                 }
                 else{
-                    dati_al_client.writeBytes("Nessun partner connesso: chiudere la connessione o attendere un partner.\n");
+                    dati_al_client.writeBytes(new Messaggio("Nessun partner connesso: chiudere la connessione o attendere un partner.").toString()+"\n");
                 }
             }
         }
@@ -114,8 +120,18 @@ public class ServerChat implements Runnable{
         dati_al_client.writeBytes(nome_client+"\n");
         System.out.print(Thread.currentThread().getName()+" -> ");
         utenti_connessi.remove(Thread.currentThread().getName());
+        String testo="";
+        if(!utenti_connessi.isEmpty()){
+            Object[] utenti=utenti_connessi.keySet().toArray();
+            for (Object u : utenti) {
+                String s=(String)u;
+                testo+=s+Messaggio.SPLIT_MEMBERS;
+            }
+            testo=testo.substring(0, testo.lastIndexOf(Messaggio.SPLIT_MEMBERS));
+        }
+        dati_al_client.writeBytes(new Messaggio(testo).toString()+"\n");
         Thread.currentThread().setName("Thread."+nome_client);
-        utenti_connessi.put(Thread.currentThread().getName(), c);
+        utenti_connessi.put(nome_client, c);
         System.out.println(Thread.currentThread().getName());
         System.out.println(Thread.currentThread().getName()+" >> connesso.");
         if(client_disponibili.size()>1){
@@ -123,7 +139,7 @@ public class ServerChat implements Runnable{
                 if (!partner.equals(this.socket_client)) {
                     try {
                         dati_al_partner=new DataOutputStream(partner.getOutputStream());
-                        dati_al_partner.writeBytes(nome_client+" si e' connesso.\n");
+                        dati_al_partner.writeBytes(new Messaggio(nome_client,Messaggio.CONNESSIONE).toString()+"\n");
                     }
                     catch (IOException e) {
                         System.err.println(e.getMessage());
@@ -135,7 +151,7 @@ public class ServerChat implements Runnable{
         }
         else{
             try {
-                dati_al_client.writeBytes("Sei l'unico utente attualemente connesso.\n");
+                dati_al_client.writeBytes(new Messaggio("Sei l'unico utente attualemente connesso.").toString()+"\n");
             } catch (IOException e) {
                 System.err.println(e.getMessage());
                 System.err.println(Thread.currentThread().getName()+" >> Errore nella comunicazione col partner del client.");
@@ -155,14 +171,13 @@ public class ServerChat implements Runnable{
      * Il metodo che comunica agli altri client la disconnessione, se presenti
      * @throws IOException lanciata in caso di errori nell gestione dei flussi di comunicazione
      */
-    private void comunicaDisconnessione() throws IOException{
-        dati_al_client.writeBytes("FINE\n");
-        if(client_disponibili.size()>1){
+    private void comunicaDisconnessione(){
+        if(client_disponibili.size()>=1){
             client_disponibili.forEach((partner) -> {
                 if (!partner.equals(this.socket_client)) {
                     try {
                         dati_al_partner=new DataOutputStream(partner.getOutputStream());
-                        dati_al_partner.writeBytes(nome_client+" si e' disconnesso.\n");
+                        dati_al_partner.writeBytes(new Messaggio(nome_client,Messaggio.DISCONNESSIONE).toString()+"\n");
                     }
                     catch (IOException e) {
                         System.err.println(e.getMessage());
@@ -182,7 +197,7 @@ public class ServerChat implements Runnable{
             if(!partner.equals(this.socket_client)){
                 try {
                     dati_al_partner=new DataOutputStream(partner.getOutputStream());
-                    dati_al_partner.writeBytes("Da: "+nome_client+"\nTesto: "+messaggio_client+'\n');
+                    dati_al_partner.writeBytes(messaggio.toString()+'\n');
                 }
                 catch (IOException e) {
                     try {
