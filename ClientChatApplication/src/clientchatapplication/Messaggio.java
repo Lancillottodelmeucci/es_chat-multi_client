@@ -1,15 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package clientchatapplication;
 
 import java.util.*;
 
 /**
- *
- * @author giova
+ * La classe del messaggio da inviare e ricevere
+ * @author Giovanni Ciaranfi
  */
 public class Messaggio {
     static final int CONNESSIONE=0,MESSAGGIO_SERVER=1,MESSAGGIO_CLIENT=2,CLIENTS_FETCH=3,DISCONNESSIONE=4;
@@ -20,7 +15,15 @@ public class Messaggio {
     String testo;
     int tipo;
     GregorianCalendar data;
+    /**
+     * Il costruttore parametrizzato per il metodo reBuild
+     */
     public Messaggio(){}
+    /**
+     * Il costruttore parametrizzato
+     * @param m il mittente
+     * @param t  il testo del emssaggio
+     */
     public Messaggio(String m,int t){//conn disconn fetch
         testo="";
         mittente=m;
@@ -28,6 +31,10 @@ public class Messaggio {
         tipo=t;
         data=new GregorianCalendar();
     }
+    /**
+     * Il costruttore parametrizzato
+     * @param t il testo del messaggio
+     */
     public Messaggio(String t){//serv
         testo=t;
         mittente="";
@@ -35,12 +42,25 @@ public class Messaggio {
         tipo=MESSAGGIO_SERVER;
         data=new GregorianCalendar();
     }
+    /**
+     * Il costruttore parametrizzato
+     * @param t il testo del messaggio
+     * @param m il mittente
+     * @param d il destinatario
+     */
     public Messaggio(String t,String m,String d){//?
         testo=t;
         mittente=m;
         destinatario=d;
         data=new GregorianCalendar();
     }
+    /**
+     * Il costruttore parametrizzato
+     * @param t il testo del messaggio
+     * @param m il mittente
+     * @param d il destinatario
+     * @param tipo il tipo di messaggio
+     */
     public Messaggio(String t,String m,String d, int tipo){//mess
         testo=t;
         mittente=m;
@@ -48,6 +68,11 @@ public class Messaggio {
         this.tipo=tipo;
         data=new GregorianCalendar();
     }
+    /**
+     * Il metodo che trasforma il messaggio in stringa per essere inviato
+     * @return la stringa
+     */
+    @Override
     public String toString() {
         String r="";
         r+=mittente+SPLIT_CHARS;
@@ -56,6 +81,11 @@ public class Messaggio {
         r+=tipo;
         return (r);
     }
+    /**
+     * Il metodo che costruisce un Messaggio da una stringa
+     * @param M il messaggio in toString
+     * @return il Messaggio
+     */
     public final static Messaggio reBuild(String M){
         Messaggio r=new Messaggio();
         String[] campi=M.split(SPLIT_CHARS);
@@ -65,18 +95,38 @@ public class Messaggio {
         r.setTipo(Integer.parseInt(campi[3]));
         return (r);
     }
+    /**
+     * Il metodo per impostare il valore
+     * @param data la data
+     */
     public void setData(GregorianCalendar data) {
         this.data = data;
     }
+    /**
+     * Il metodo per impostare il valore
+     * @param destinatario il destinatario
+     */
     public void setDestinatario(String destinatario) {
         this.destinatario = destinatario;
     }
+    /**
+     * Il metodo per impostare il valore
+     * @param mittente il mittente
+     */
     public void setMittente(String mittente) {
         this.mittente = mittente;
     }
+    /**
+     * Il metodo per impostare il valore
+     * @param testo il testo
+     */
     public void setTesto(String testo) {
         this.testo = testo;
     }
+    /**
+     * Il metodo per impostare il valore
+     * @param tipo il tipo
+     */
     public void setTipo(int tipo) {
         this.tipo = tipo;
     }

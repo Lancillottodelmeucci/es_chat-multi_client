@@ -159,6 +159,11 @@ public class ServerChat implements Runnable{
             }
         }
     }
+    /**
+     * Il metodo che controlla l'univocita' del nomitativo
+     * @param n il nome scelto dal client
+     * @return l'esito del controllo
+     */
     private boolean nomeCorretto(String n){
         for (Thread t : thread_in_esecuzione) {
             if(t.getName().substring(7).equals(n)){

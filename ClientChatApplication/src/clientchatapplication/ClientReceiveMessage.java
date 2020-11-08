@@ -18,7 +18,6 @@ import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 class ClientReceiveMessage implements Runnable{
     private String risposta;
     private BufferedReader dati_dal_server;
-    private JPanel chat;
     private Messaggio messaggio;
     private JList<String> membri;
     DefaultListModel<String> dlm;
@@ -27,11 +26,14 @@ class ClientReceiveMessage implements Runnable{
     public String nome;
     /**
      * Costruttore parametrizzato
-     * @param c il client dal quale ricevere gli oggetti necessari alla comunicazione
+     * @param br il canale per la recezione dei messaggi
+     * @param d la lista degli utenti connessi
+     * @param t l'insieme dei pannelli delle chat
+     * @param h la lista delle chat su cui aggiungere i messaggi
+     * @param n il nome del client
      */
-    public ClientReceiveMessage(BufferedReader br,JPanel p,DefaultListModel<String> d,JTabbedPane t,HashMap<String,JPanel> h,String n){
+    public ClientReceiveMessage(BufferedReader br,DefaultListModel<String> d,JTabbedPane t,HashMap<String,JPanel> h,String n){
         dati_dal_server=br;
-        chat=p;
         dlm=d;
         multiChat=t;
         pannelliChat=h;
@@ -59,6 +61,11 @@ class ClientReceiveMessage implements Runnable{
             }
         }
     }
+    /**
+     * Il metodo che permette di visualizzare il messaggio ricevuto e gestisce 
+     * la lista dei client connessi
+     * @param m il messaggio ricevuto
+     */
     public void visualizzaMessaggio(Messaggio m){
         JLabel l;
         switch(m.tipo){
@@ -90,9 +97,13 @@ class ClientReceiveMessage implements Runnable{
             appo=pannelliChat.get("mainGroupChat");
         }
         appo.add(l);
-        appo.setPreferredSize(new Dimension(500, chat.getHeight()+25));
+        appo.setPreferredSize(new Dimension(500, appo.getHeight()+25));
         SwingUtilities.updateComponentTreeUI(appo);
     }
+    /**
+     * Il metodo che crea il pannello di una nuova chat privata
+     * @param u il nome dell'utente
+     */
     public void creaChatPrivata(String u){
         JPanel c;
         c=new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));

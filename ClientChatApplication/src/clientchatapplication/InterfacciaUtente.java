@@ -30,10 +30,22 @@ public class InterfacciaUtente extends JFrame{
     public DataOutputStream dati_al_server;
     public BufferedReader dati_dal_server;
     public String nome;
+    JPanel accesso;
+    JLabel esito;
+    JTextField input;
+    JButton send;
+    DefaultListModel<String> dlm=new DefaultListModel<>();
+    JList<String> membri;
+    /**
+     * Il costruttore della classe
+     */
     public InterfacciaUtente(){
         initSocket();
         initComponent();
     }
+    /**
+     * Il metodo che crea i componenti per la chat
+     */
     private void initComponent(){
         this.setBounds(new Rectangle(800, 537));
         this.setResizable(false);
@@ -99,10 +111,9 @@ public class InterfacciaUtente extends JFrame{
         initAccess();
         this.setVisible(true);
     }
-    JPanel accesso;
-    JLabel esito;
-    JTextField input;
-    JButton send;
+    /**
+     * Il metodo che crea i componenti per l'accesso
+     */
     private void initAccess(){
         accesso=new JPanel(null);
         accesso.setBackground(Color.BLUE);
@@ -144,6 +155,9 @@ public class InterfacciaUtente extends JFrame{
         input.requestFocus();
         accesso.add(send);
     }
+    /**
+     * Il metodo che inizializza il socket
+     */
     private void initSocket(){
         try {
             socket=new Socket(nome_server,porta_server);
@@ -161,13 +175,18 @@ public class InterfacciaUtente extends JFrame{
             System.exit(0);
         }
     }
+    /**
+     * Il metodo che lancia il thread per la ricezione dei messaggi
+     */
     private void startProcesses(){
-        ClientReceiveMessage c_r_m=new ClientReceiveMessage(dati_dal_server,chat,dlm,multiChat,pannelliChat,nome);
+        ClientReceiveMessage c_r_m=new ClientReceiveMessage(dati_dal_server,dlm,multiChat,pannelliChat,nome);
         Thread t_r=new Thread(c_r_m);
         t_r.start();
     }
-    DefaultListModel<String> dlm=new DefaultListModel<>();
-    JList<String> membri;
+    /**
+     * Il metodo che recupera la lista degli utenti gia' connessi
+     * @throws IOException nel caso di errore di comunicazione
+     */
     public void fetchClients() throws IOException{
         risposta=dati_dal_server.readLine();
         messaggio=Messaggio.reBuild(risposta).testo;
@@ -195,6 +214,10 @@ public class InterfacciaUtente extends JFrame{
         membriInChat.setViewportView(membri);
         SwingUtilities.updateComponentTreeUI(membriInChat);
     }
+    /**
+     * Il metodo che crea il pannello di una nuova chat privata
+     * @param u il nome dell'utente
+     */
     public void creaChatPrivata(String u){
         JPanel c;
         c=new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
