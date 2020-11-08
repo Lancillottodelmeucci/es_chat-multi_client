@@ -196,10 +196,10 @@ public class ServerChat implements Runnable{
      * nessun altro utente connesso
      */
     private void inviaMessaggio(){
-        client_disponibili.forEach((partner) -> {
-            if(!partner.equals(this.socket_client)){
+        utenti_connessi.forEach((k, c) -> {
+            if(!k.equals(nome_client)&&(messaggio.destinatario.equals("mainGroupChat")||k.equals(messaggio.destinatario))){
                 try {
-                    dati_al_partner=new DataOutputStream(partner.getOutputStream());
+                    dati_al_partner=new DataOutputStream(c.getSocket().getOutputStream());
                     dati_al_partner.writeBytes(messaggio.toString()+'\n');
                 }
                 catch (IOException e) {
@@ -215,5 +215,10 @@ public class ServerChat implements Runnable{
                 }
             }
         });
+//        client_disponibili.forEach((partner) -> {
+//            if(!partner.equals(this.socket_client)){
+//                
+//            }
+//        });
     }
 }

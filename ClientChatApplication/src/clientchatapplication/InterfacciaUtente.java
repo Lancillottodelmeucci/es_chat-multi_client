@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static javax.swing.ScrollPaneConstants.*;
@@ -17,13 +18,15 @@ import javax.swing.border.LineBorder;
  */
 public class InterfacciaUtente extends JFrame{
     private JPanel mainPanel;
-    private JPanel chatDisponibili;
+//    private JPanel chatDisponibili;//per ora da togliere
     private JPanel chat;
     private JPanel invioMessaggi;
     private JTextField inserimento;
     private JButton invio;
     private JPanel membriInChat;
     private JScrollPane scrollChat;
+    private JTabbedPane multiChat;
+    private HashMap<String,JPanel> pannelliChat;
     
     private final String nome_server="127.0.0.1";
     private final int porta_server=7777;
@@ -41,17 +44,23 @@ public class InterfacciaUtente extends JFrame{
         this.setBounds(new Rectangle(800, 537));//heigh: 500 + 37 (dimensione dei sopra)
         this.setResizable(false);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        pannelliChat=new HashMap<>();
         mainPanel=new JPanel(null);
         //this.add(mainPanel);
         mainPanel.setBackground(Color.CYAN);
-        chatDisponibili=new JPanel(null);
-        chatDisponibili.setBounds(0, 0, 80, 500);
-        chatDisponibili.setBackground(Color.GRAY);
-        mainPanel.add(chatDisponibili);
+        multiChat=new JTabbedPane();
+        multiChat.setTabPlacement(JTabbedPane.LEFT);
+        multiChat.setBounds(0, 0, 650, 455);
+//        chatDisponibili=new JPanel(null);
+//        chatDisponibili.setBounds(0, 0, 80, 500);
+//        chatDisponibili.setBackground(Color.GRAY);
+//        mainPanel.add(chatDisponibili);
+        mainPanel.add(multiChat);
         chat=new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 //        chat.setBounds(new Rectangle(570, 455));
 //        chat.setPreferredSize(new Dimension(500, 0));
         chat.setBackground(Color.PINK);
+        pannelliChat.put("mainGroupChat", chat);
         scrollChat=new JScrollPane(chat);
         scrollChat.setBounds(80, 0, 570, 455);
 //        scrollChat.setPreferredSize(new Dimension(570, 455));
@@ -59,7 +68,8 @@ public class InterfacciaUtente extends JFrame{
 //        scrollChat.createVerticalScrollBar();
         scrollChat.setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollChat.setWheelScrollingEnabled(true);
-        mainPanel.add(scrollChat);
+        multiChat.add("mainGroupChat",scrollChat);
+//        mainPanel.add(scrollChat);
         invioMessaggi=new JPanel(null);
         invioMessaggi.setBackground(Color.GREEN);
         invioMessaggi.setBounds(80, 455, 570, 45);
@@ -83,11 +93,12 @@ public class InterfacciaUtente extends JFrame{
                 l.setBorder(new LineBorder(Color.BLACK));
                 l.setPreferredSize(new Dimension(550, 25));
                 l.setHorizontalAlignment(4);
-                chat.add(l);
-                chat.setPreferredSize(new Dimension(500, chat.getHeight()+25));
-                SwingUtilities.updateComponentTreeUI(chat);
+                JPanel appo=pannelliChat.get(multiChat.getTitleAt(multiChat.getSelectedIndex()));
+                appo.add(l);
+                appo.setPreferredSize(new Dimension(500, chat.getHeight()+25));
+                SwingUtilities.updateComponentTreeUI(appo);
                 //scrollChat.getVerticalScrollBar().setValue(-1);
-                dati_al_server.writeBytes(new Messaggio(messaggio, nome, "mainGroupChat", Messaggio.MESSAGGIO_CLIENT).toString()+"\n");
+                dati_al_server.writeBytes(new Messaggio(messaggio, nome, multiChat.getTitleAt(multiChat.getSelectedIndex()), Messaggio.MESSAGGIO_CLIENT).toString()+"\n");
             } catch (IOException e) {
                 System.err.println(e.getMessage());
                 System.err.println("Errore durante la comunicazione.");
@@ -168,7 +179,7 @@ public class InterfacciaUtente extends JFrame{
     }
     private void startProcesses(){
         //ClientSendMessage c_s_m=new ClientSendMessage();
-        ClientReceiveMessage c_r_m=new ClientReceiveMessage(dati_dal_server,chat,dlm);
+        ClientReceiveMessage c_r_m=new ClientReceiveMessage(dati_dal_server,chat,dlm,multiChat,pannelliChat,nome);
         //Thread t_s=new Thread(c_s_m);
         Thread t_r=new Thread(c_r_m);
         t_r.start();
@@ -196,8 +207,32 @@ public class InterfacciaUtente extends JFrame{
                 dlm.addElement(u);
             }
         }
+        membri.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent evt) {
+                JList l = (JList)evt.getSource();
+                if (evt.getClickCount() == 2) {
+                    // Double-click detected
+                    int i = l.locationToIndex(evt.getPoint());
+                    creaChatPrivata(dlm.get(i));
+                }
+            }
+        });
         membri.setBounds(0, 0, 150, 500);
         membriInChat.add(membri);
         SwingUtilities.updateComponentTreeUI(membriInChat);
+    }
+    public void creaChatPrivata(String u){
+        JPanel c;
+        c=new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        c.setBackground(Color.PINK);
+        pannelliChat.put(u, c);
+        JScrollPane s;
+        s=new JScrollPane(c);
+        s.setBounds(80, 0, 570, 455);
+        s.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
+        s.setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_AS_NEEDED);
+        s.setWheelScrollingEnabled(true);
+        multiChat.add(u,s);
+        SwingUtilities.updateComponentTreeUI(multiChat);
     }
 }
