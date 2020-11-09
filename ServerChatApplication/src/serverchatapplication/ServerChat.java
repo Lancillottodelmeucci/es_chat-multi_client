@@ -29,6 +29,7 @@ public class ServerChat implements Runnable{
      * @param s il socket del client connesso
      * @param s_a la lista dei socket connessi alla chat
      * @param tie la lista dei thread per ogni singolo client
+     * @param Connessioni lista delle connessioni completa
      */
     public ServerChat(Socket s,ArrayList<Socket> s_a,ArrayList<Thread> tie,HashMap<String,Connessioni> uc){
         thread_in_esecuzione=tie;
