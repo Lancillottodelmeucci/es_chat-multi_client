@@ -9,3 +9,4 @@ ClientChatApplication/build/
 ClientChatApplication/nbproject/
 /ClientChatApplication/dist/
 /ServerChatApplication/dist/
+*.docx
