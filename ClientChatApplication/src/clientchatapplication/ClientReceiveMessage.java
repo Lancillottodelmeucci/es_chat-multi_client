@@ -16,15 +16,13 @@ import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
  * @author Giovanni Ciaranfi
  */
 class ClientReceiveMessage implements Runnable{
-    //private String rispostaObsoleta;
-    //private Messaggio risposta;
     private BufferedReader dati_dal_server;
     private Messaggio messaggio;
     private JList<String> membri;
-    DefaultListModel<String> dlm;
+    private DefaultListModel<String> dlm;
     private JTabbedPane multiChat;
     private HashMap<String,JPanel> pannelliChat;
-    public String nome;
+    private String nome;
     /**
      * Costruttore parametrizzato
      * @param br il canale per la recezione dei messaggi
@@ -48,9 +46,8 @@ class ClientReceiveMessage implements Runnable{
     public void run() {
         for(;;){
             try {
-                //risposta=dati_dal_server.readLine();
                 messaggio=Messaggio.reBuild(dati_dal_server.readLine());
-                if(messaggio.testo.toUpperCase().equals("FINE")){
+                if(messaggio.getTesto().toUpperCase().equals("FINE")){
                     System.exit(0);
                 }
                 visualizzaMessaggio(messaggio);
@@ -69,40 +66,41 @@ class ClientReceiveMessage implements Runnable{
      */
     public void visualizzaMessaggio(Messaggio m){
         JLabel l;
-        switch(m.tipo){
+        switch(m.getTipo()){
             case Messaggio.DISCONNESSIONE:
-                l=new JLabel("<html>"+m.mittente+" si e' disconnesso</html>");
-                dlm.removeElement(m.mittente);
+                l=new JLabel("<html>"+m.getMittente()+" si e' disconnesso</html>");
+                dlm.removeElement(m.getMittente());
                 break;
             case Messaggio.CONNESSIONE:
-                l=new JLabel("<html>"+m.mittente+" si e' connesso.</html>");
-                dlm.addElement(m.mittente);
+                l=new JLabel("<html>"+m.getMittente()+" si e' connesso.</html>");
+                dlm.addElement(m.getMittente());
                 break;
             default:
-                if(m.destinatario.equals(nome)||m.destinatario.equals("Invia a tutti")){
-                    l=new JLabel("<html>"+m.testo+"</html>");
+                if(m.getDestinatario().equals(nome)||m.getDestinatario().equals("Invia a tutti")){
+                    l=new JLabel("<html>"+m.getTesto()+"</html>");
                 }
                 else{
-                    l=new JLabel("<html>"+(m.mittente.equals("")?"":"Da "+m.mittente+": ")+m.testo+"</html>");
+                    l=new JLabel("<html>"+(m.getMittente().equals("")?"":"Da "+m.getMittente()+": ")+m.getTesto()+"</html>");
                 }
                 break;
         }
         l.setPreferredSize(new Dimension(625, 25));
         l.setHorizontalAlignment(2);
         JPanel appo;
-        if(m.destinatario.equals(nome)||m.destinatario.equals("Invia a tutti")){
-            if(!pannelliChat.containsKey(m.mittente)){
-                creaChatPrivata(m.mittente);
+        if(m.getDestinatario().equals(nome)||m.getDestinatario().equals("Invia a tutti")){
+            if(!pannelliChat.containsKey(m.getMittente())){
+                creaChatPrivata(m.getMittente());
             }
-            appo=pannelliChat.get(m.mittente);
+            appo=pannelliChat.get(m.getMittente());
         }
-        else if(m.mittente==null||m.mittente.equals("")){
+        else if(m.getMittente()==null||m.getMittente().equals("")){
             appo=pannelliChat.get("mainGroupChat");
         }
         else{
             appo=pannelliChat.get("mainGroupChat");
         }
         /*
+        feauture:
         se il messaggio arriva a una chat diversa da quella in cui sono cambiare il suo colore di sfondo
         e rimetterlo al suo default quando ci clicco sopra
         */
@@ -111,7 +109,8 @@ class ClientReceiveMessage implements Runnable{
         SwingUtilities.updateComponentTreeUI(appo);
     }
     /**
-     * Il metodo che crea il pannello di una nuova chat privata
+     * Il metodo che crea il pannello di una nuova chat privata all'arrivo di un
+     * messaggio da un client con il quale ancora non c'e'
      * @param u il nome dell'utente
      */
     public void creaChatPrivata(String u){

@@ -9,7 +9,8 @@ import java.util.HashMap;
 import static javax.swing.ScrollPaneConstants.*;
 
 /**
- *
+ * La classe che gestisce l'interfaccia grafica inerente all'accesso e alla 
+ * chat
  * @author Giovanni Ciaranfi
  */
 public class InterfacciaUtente extends JFrame{
@@ -25,20 +26,21 @@ public class InterfacciaUtente extends JFrame{
     private final String nome_server="127.0.0.1";
     private final int porta_server=7777;
     private Socket socket;
-    public String messaggio;
-    //public String rispostaObsoleta;//sostituire con Messaggio
+    private String messaggio;
     private Messaggio risposta;
-    public DataOutputStream dati_al_server;
-    public BufferedReader dati_dal_server;
-    public String nome;
-    JPanel accesso;
-    JLabel esito;
-    JTextField input;
-    JButton send;
-    DefaultListModel<String> dlm=new DefaultListModel<>();
-    JList<String> membri;
+    private DataOutputStream dati_al_server;
+    private BufferedReader dati_dal_server;
+    private String nome;
+    private JPanel accesso;
+    private JLabel esito;
+    private JTextField input;
+    private JButton send;
+    private DefaultListModel<String> dlm=new DefaultListModel<>();
+    private JList<String> membri;
+    private JCheckBox jcb;
     /**
-     * Il costruttore della classe
+     * Il costruttore della classe che genera il contenuto per l'accesso e per 
+     * la chat
      */
     public InterfacciaUtente(){
         initSocket();
@@ -53,7 +55,6 @@ public class InterfacciaUtente extends JFrame{
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         pannelliChat=new HashMap<>();
         mainPanel=new JPanel(null);
-        //this.add(mainPanel);
         mainPanel.setBackground(Color.CYAN);
         multiChat=new JTabbedPane();
         multiChat.setTabPlacement(JTabbedPane.TOP);
@@ -79,6 +80,10 @@ public class InterfacciaUtente extends JFrame{
         invio=new JButton("Invia");
         invio.setBounds(580, 0, 70, 45);
         invio.setBackground(Color.ORANGE);
+        /*
+        improvement:
+        creare una classe separata per gli eventi
+        */
         invio.addActionListener((ActionEvent ev) -> {
             messaggio=inserimento.getText();
             if(messaggio==null||messaggio.equals("")){
@@ -87,12 +92,13 @@ public class InterfacciaUtente extends JFrame{
             Messaggio appoM=new Messaggio(messaggio, nome, multiChat.getTitleAt(multiChat.getSelectedIndex()), Messaggio.MESSAGGIO_CLIENT);
             inserimento.setText("");
             inserimento.requestFocus();
-            if(appoM.testo.equalsIgnoreCase("FINE")&&!appoM.destinatario.equals("mainGroupChat")){
+            if(appoM.getTesto().equalsIgnoreCase("FINE")&&!appoM.getDestinatario().equals("mainGroupChat")){
                 multiChat.remove(multiChat.getSelectedIndex());
                 return;
             }
             try {
                 /*
+                feauture:
                 inserire un messaggio di tipo ping verso il server per sapere se posso inviare o meno il messaggio
                 */
                 JLabel l=new JLabel("<html>"+messaggio+"</html>");
@@ -103,6 +109,7 @@ public class InterfacciaUtente extends JFrame{
                 appo.add(l);
                 appo.setPreferredSize(new Dimension(500, chat.getHeight()+25));
                 /*
+                improvement:
                 aumentare solo se necessario, contando il numero di label e sommando la loro altezza
                 usare instanceof se necessario sulle jlabel
                 */
@@ -127,7 +134,6 @@ public class InterfacciaUtente extends JFrame{
     /**
      * Il metodo che crea i componenti per l'accesso
      */
-    JCheckBox jcb;
     private void initAccess(){
         accesso=new JPanel(null);
         accesso.setBackground(Color.BLUE);
@@ -165,17 +171,17 @@ public class InterfacciaUtente extends JFrame{
                     dati_al_server.writeBytes(new Messaggio(input.getText(), Messaggio.INVIO_NOME).toString()+'\n');
                 }
                 risposta=Messaggio.reBuild(dati_dal_server.readLine());
-                if(!risposta.testo.equals("OK")){
-                    esito.setText(risposta.testo);
+                if(!risposta.getTesto().equals("OK")){
+                    esito.setText(risposta.getTesto());
                 }
                 else{
                     risposta=Messaggio.reBuild(dati_dal_server.readLine());
-                    nome=risposta.testo;
+                    nome=risposta.getTesto();
                     this.remove(accesso);
                     inserimento.setEnabled(true);
                     invio.setEnabled(true);
                     this.add(mainPanel);
-                    this.setTitle("Connesso come "+risposta.testo);
+                    this.setTitle("Connesso come "+risposta.getTesto());
                     fetchClients();
                     SwingUtilities.updateComponentTreeUI(this);
                     startProcesses();
@@ -190,7 +196,7 @@ public class InterfacciaUtente extends JFrame{
         accesso.add(send);
     }
     /**
-     * Il metodo che inizializza il socket
+     * Il metodo che inizializza il socket e la connessione al server
      */
     private void initSocket(){
         try {
@@ -219,16 +225,15 @@ public class InterfacciaUtente extends JFrame{
     }
     /**
      * Il metodo che recupera la lista degli utenti gia' connessi
-     * @throws IOException nel caso di errore di comunicazione
+     * @throws IOException nel caso di errore di comunicazione col server
      */
     public void fetchClients() throws IOException{
         risposta=Messaggio.reBuild(dati_dal_server.readLine());
-        //messaggio=Messaggio.reBuild(risposta).testo;
         membri=new JList<>(dlm);
         membri.setLayoutOrientation(JList.VERTICAL);
         SwingUtilities.updateComponentTreeUI(membriInChat);
-        if(risposta.testo!=null&&!risposta.testo.equals("")){
-            String[] utenti=risposta.testo.split(Messaggio.SPLIT_MEMBERS);
+        if(risposta.getTesto()!=null&&!risposta.getTesto().equals("")){
+            String[] utenti=risposta.getTesto().split(Messaggio.SPLIT_MEMBERS);
             for (String u : utenti) {
                 dlm.addElement(u);
             }
@@ -241,7 +246,6 @@ public class InterfacciaUtente extends JFrame{
                     if(!pannelliChat.containsKey(dlm.get(i))){
                         creaChatPrivata(dlm.get(i));
                     }
-//                    multiChat.setSelectedComponent(pannelliChat.get(dlm.get(i)));
                 }
             }
         });

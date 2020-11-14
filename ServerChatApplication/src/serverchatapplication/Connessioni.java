@@ -9,7 +9,10 @@ import java.net.Socket;
 public class Connessioni {
     private Socket socket_client;
     private Thread thread_client;
-    //aggiungere storico messaggi?
+    /*
+    feauture:
+    inserire lo storico dei messaggi inviati da un client (o sottoforma di stringhe o di Messaggio)
+    */
     /**
      * Il costruttore parametrizzato
      * @param s il socket
