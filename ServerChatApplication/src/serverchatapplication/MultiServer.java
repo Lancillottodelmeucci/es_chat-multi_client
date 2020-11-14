@@ -12,8 +12,8 @@ import java.util.HashMap;
  */
 public class MultiServer implements Runnable{
     private ServerSocket server_socket=null;
-    private ArrayList<Socket> client_disponibili=new ArrayList();
-    private ArrayList<Thread> thread_in_esecuzione=new ArrayList();
+    //private ArrayList<Socket> client_disponibili=new ArrayList();//da rimuovere
+    //private ArrayList<Thread> thread_in_esecuzione=new ArrayList();//da rimuovere
     private HashMap<String,Connessioni> utenti_connessi=new HashMap();
     /**
      * Il costruttore della classe che apre il socket del server
@@ -44,7 +44,7 @@ public class MultiServer implements Runnable{
             }
         }
         for(;;){
-            System.out.println("Nuovo thread in attesa di un client.");
+            System.out.println("Server in attesa di un nuovo client.");//Server in attesa di un nuovo client
             Socket client_socket;
             try {
                 client_socket=server_socket.accept();
@@ -54,9 +54,9 @@ public class MultiServer implements Runnable{
                 break;
             }
             Thread t;
-            ServerChat server_thread=new ServerChat(client_socket,client_disponibili,thread_in_esecuzione,utenti_connessi);
+            ServerChat server_thread=new ServerChat(client_socket,utenti_connessi);
             t=new Thread(server_thread);
-            Connessioni c=new Connessioni(client_socket, t);
+            //Connessioni c=new Connessioni(client_socket, t);//da commentare
             t.start();
         }
     }
@@ -80,18 +80,7 @@ public class MultiServer implements Runnable{
     public ServerSocket getServerSocket(){
         return (server_socket);
     }
-    /**
-     * 
-     * @return la lista dei thread che gestiscono i client
-     */
-    public ArrayList<Thread> getThreads(){
-        return (thread_in_esecuzione);
-    }
-    /**
-     * 
-     * @return la lista dei socket dei client
-     */
-    public ArrayList<Socket> getSockets(){
-        return (client_disponibili);
+    public HashMap<String,Connessioni> getUtentiConnessi(){
+        return (utenti_connessi);
     }
 }

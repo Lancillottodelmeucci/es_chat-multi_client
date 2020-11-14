@@ -26,7 +26,8 @@ public class InterfacciaUtente extends JFrame{
     private final int porta_server=7777;
     private Socket socket;
     public String messaggio;
-    public String risposta;
+    //public String rispostaObsoleta;//sostituire con Messaggio
+    private Messaggio risposta;
     public DataOutputStream dati_al_server;
     public BufferedReader dati_dal_server;
     public String nome;
@@ -83,9 +84,17 @@ public class InterfacciaUtente extends JFrame{
             if(messaggio==null||messaggio.equals("")){
                 return;
             }
+            Messaggio appoM=new Messaggio(messaggio, nome, multiChat.getTitleAt(multiChat.getSelectedIndex()), Messaggio.MESSAGGIO_CLIENT);
             inserimento.setText("");
             inserimento.requestFocus();
+            if(appoM.testo.equalsIgnoreCase("FINE")&&!appoM.destinatario.equals("mainGroupChat")){
+                multiChat.remove(multiChat.getSelectedIndex());
+                return;
+            }
             try {
+                /*
+                inserire un messaggio di tipo ping verso il server per sapere se posso inviare o meno il messaggio
+                */
                 JLabel l=new JLabel("<html>"+messaggio+"</html>");
                 //l.setBorder(new LineBorder(Color.BLACK));
                 l.setPreferredSize(new Dimension(625, 25));
@@ -93,8 +102,12 @@ public class InterfacciaUtente extends JFrame{
                 JPanel appo=pannelliChat.get(multiChat.getTitleAt(multiChat.getSelectedIndex()));
                 appo.add(l);
                 appo.setPreferredSize(new Dimension(500, chat.getHeight()+25));
+                /*
+                aumentare solo se necessario, contando il numero di label e sommando la loro altezza
+                usare instanceof se necessario sulle jlabel
+                */
                 SwingUtilities.updateComponentTreeUI(appo);
-                dati_al_server.writeBytes(new Messaggio(messaggio, nome, multiChat.getTitleAt(multiChat.getSelectedIndex()), Messaggio.MESSAGGIO_CLIENT).toString()+"\n");
+                dati_al_server.writeBytes(appoM.toString()+"\n");
             } catch (IOException e) {
                 System.err.println(e.getMessage());
                 System.err.println("Errore durante la comunicazione.");
@@ -114,6 +127,7 @@ public class InterfacciaUtente extends JFrame{
     /**
      * Il metodo che crea i componenti per l'accesso
      */
+    JCheckBox jcb;
     private void initAccess(){
         accesso=new JPanel(null);
         accesso.setBackground(Color.BLUE);
@@ -124,25 +138,45 @@ public class InterfacciaUtente extends JFrame{
         input=new JTextField();
         input.setBounds(200, 150, 400, 50);
         accesso.add(input);
+        jcb=new JCheckBox("Entra con un nome casuale.");
+        jcb.addActionListener((e) -> {
+            input.setEnabled(!jcb.isSelected());
+            if(jcb.isSelected()){
+                send.requestFocus();
+            }
+            else{
+                input.requestFocus();
+            }
+        });
+        jcb.setBounds(200, 200, 400, 50);
+        accesso.add(jcb);
         send=new JButton("Verifica");
-        send.setBounds(350, 200, 100, 50);
+        send.setBounds(350, 250, 100, 50);
         send.addActionListener((ActionEvent ev) -> {
-            String rispServ;
+            //String rispServ;
             try {
-                dati_al_server.writeBytes(input.getText()+'\n');
-                rispServ=dati_dal_server.readLine();
-                if(!rispServ.equals("OK")){
-                    esito.setText(rispServ);
+                if(jcb.isSelected()){
+                    dati_al_server.writeBytes(new Messaggio("", Messaggio.INVIO_NOME).toString()+'\n');
                 }
                 else{
-                    rispServ=dati_dal_server.readLine();
-                    nome=rispServ;
+                    if(input.getText().equals("")||input.getText()==null){
+                        return;
+                    }
+                    dati_al_server.writeBytes(new Messaggio(input.getText(), Messaggio.INVIO_NOME).toString()+'\n');
+                }
+                risposta=Messaggio.reBuild(dati_dal_server.readLine());
+                if(!risposta.testo.equals("OK")){
+                    esito.setText(risposta.testo);
+                }
+                else{
+                    risposta=Messaggio.reBuild(dati_dal_server.readLine());
+                    nome=risposta.testo;
                     this.remove(accesso);
                     inserimento.setEnabled(true);
                     invio.setEnabled(true);
-                    fetchClients();
                     this.add(mainPanel);
-                    this.setTitle("Connesso come "+rispServ);
+                    this.setTitle("Connesso come "+risposta.testo);
+                    fetchClients();
                     SwingUtilities.updateComponentTreeUI(this);
                     startProcesses();
                 }
@@ -188,13 +222,13 @@ public class InterfacciaUtente extends JFrame{
      * @throws IOException nel caso di errore di comunicazione
      */
     public void fetchClients() throws IOException{
-        risposta=dati_dal_server.readLine();
-        messaggio=Messaggio.reBuild(risposta).testo;
+        risposta=Messaggio.reBuild(dati_dal_server.readLine());
+        //messaggio=Messaggio.reBuild(risposta).testo;
         membri=new JList<>(dlm);
         membri.setLayoutOrientation(JList.VERTICAL);
         SwingUtilities.updateComponentTreeUI(membriInChat);
-        if(messaggio!=null&&!messaggio.equals("")){
-            String[] utenti=messaggio.split(Messaggio.SPLIT_MEMBERS);
+        if(risposta.testo!=null&&!risposta.testo.equals("")){
+            String[] utenti=risposta.testo.split(Messaggio.SPLIT_MEMBERS);
             for (String u : utenti) {
                 dlm.addElement(u);
             }
@@ -207,6 +241,7 @@ public class InterfacciaUtente extends JFrame{
                     if(!pannelliChat.containsKey(dlm.get(i))){
                         creaChatPrivata(dlm.get(i));
                     }
+//                    multiChat.setSelectedComponent(pannelliChat.get(dlm.get(i)));
                 }
             }
         });

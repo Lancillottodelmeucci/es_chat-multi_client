@@ -7,7 +7,7 @@ import java.util.*;
  * @author Giovanni Ciaranfi
  */
 public class Messaggio {
-    static final int CONNESSIONE=0,MESSAGGIO_SERVER=1,MESSAGGIO_CLIENT=2,CLIENTS_FETCH=3,DISCONNESSIONE=4;
+    static final int CONNESSIONE=0,INVIO_NOME=1,MESSAGGIO_SERVER=2,MESSAGGIO_CLIENT=3,CLIENTS_FETCH=4,DISCONNESSIONE=5;
     static final String SPLIT_CHARS="#S#";
     static final String SPLIT_MEMBERS="#M#";
     String mittente;
@@ -24,9 +24,15 @@ public class Messaggio {
      * @param m il mittente
      * @param t  il testo del emssaggio
      */
-    public Messaggio(String m,int t){//conn disconn fetch
-        testo="";
-        mittente=m;
+    public Messaggio(String m,int t){//conn disconn fetch nomUt
+        if(t==INVIO_NOME){
+            testo=m;
+            mittente="";
+        }
+        else{
+            testo="";
+            mittente=m;
+        }
         destinatario="";
         tipo=t;
         data=new GregorianCalendar();
@@ -48,10 +54,11 @@ public class Messaggio {
      * @param m il mittente
      * @param d il destinatario
      */
-    public Messaggio(String t,String m,String d){//?
+    public Messaggio(String t,String d,int tipo){//?
         testo=t;
-        mittente=m;
+        mittente="";
         destinatario=d;
+        this.tipo=tipo;
         data=new GregorianCalendar();
     }
     /**

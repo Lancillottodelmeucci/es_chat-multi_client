@@ -9,6 +9,7 @@ import java.net.Socket;
 public class Connessioni {
     private Socket socket_client;
     private Thread thread_client;
+    //aggiungere storico messaggi?
     /**
      * Il costruttore parametrizzato
      * @param s il socket

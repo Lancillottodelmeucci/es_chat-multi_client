@@ -16,7 +16,8 @@ import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
  * @author Giovanni Ciaranfi
  */
 class ClientReceiveMessage implements Runnable{
-    private String risposta;
+    //private String rispostaObsoleta;
+    //private Messaggio risposta;
     private BufferedReader dati_dal_server;
     private Messaggio messaggio;
     private JList<String> membri;
@@ -47,8 +48,8 @@ class ClientReceiveMessage implements Runnable{
     public void run() {
         for(;;){
             try {
-                risposta=dati_dal_server.readLine();
-                messaggio=Messaggio.reBuild(risposta);
+                //risposta=dati_dal_server.readLine();
+                messaggio=Messaggio.reBuild(dati_dal_server.readLine());
                 if(messaggio.testo.toUpperCase().equals("FINE")){
                     System.exit(0);
                 }
@@ -78,7 +79,12 @@ class ClientReceiveMessage implements Runnable{
                 dlm.addElement(m.mittente);
                 break;
             default:
-                l=new JLabel("<html>"+(m.mittente.equals("")?"":"Da "+m.mittente+": ")+m.testo+"</html>");
+                if(m.destinatario.equals(nome)||m.destinatario.equals("Invia a tutti")){
+                    l=new JLabel("<html>"+m.testo+"</html>");
+                }
+                else{
+                    l=new JLabel("<html>"+(m.mittente.equals("")?"":"Da "+m.mittente+": ")+m.testo+"</html>");
+                }
                 break;
         }
         l.setPreferredSize(new Dimension(625, 25));
@@ -96,6 +102,10 @@ class ClientReceiveMessage implements Runnable{
         else{
             appo=pannelliChat.get("mainGroupChat");
         }
+        /*
+        se il messaggio arriva a una chat diversa da quella in cui sono cambiare il suo colore di sfondo
+        e rimetterlo al suo default quando ci clicco sopra
+        */
         appo.add(l);
         appo.setPreferredSize(new Dimension(500, appo.getHeight()+25));
         SwingUtilities.updateComponentTreeUI(appo);
