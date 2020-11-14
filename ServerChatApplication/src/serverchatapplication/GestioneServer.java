@@ -4,20 +4,14 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * La classe che gestisce i comandi da eseguire sul server
+ * La classe che gestisce i comandi che possono essere eseguiti sul server
  * @author Giovanni Ciaranfi
  */
 public class GestioneServer implements Runnable{
     private MultiServer multi_server;
-    //private final ServerSocket server_socket;
-    //private ArrayList<Socket> client_disponibili;
-    //private ArrayList<Thread> thread_in_esecuzione;
     private HashMap<String,Connessioni> utenti_connessi;
     private BufferedReader input_tastiera;
     private String comando;
@@ -28,15 +22,12 @@ public class GestioneServer implements Runnable{
      * @param ms la classe che contiene le variabili per il multiserver
      */
     public GestioneServer(MultiServer ms){
-        //server_socket=ms.getServerSocket();
-        //client_disponibili=ms.getSockets();
-        //thread_in_esecuzione=ms.getThreads();
         utenti_connessi=ms.getUtentiConnessi();
         input_tastiera=new BufferedReader(new InputStreamReader(System.in));
         multi_server=ms;
     }
     /**
-     * Il metodo che gestisce gli input e i metodi dei comandi
+     * Il metodo che gestisce il ciclo per leggere i comandi inseriti
      */
     @Override
     public void run(){
@@ -57,7 +48,10 @@ public class GestioneServer implements Runnable{
             controlloComando();
         }
     }
-    public void controlloComando(){
+    /**
+     * Il metodo che gestisce le azioni da effettuare per ogni comando
+     */
+    private void controlloComando(){
         switch(comandi[0].toLowerCase()){
             case "list":
                 mostraPartecipanti();
@@ -68,7 +62,7 @@ public class GestioneServer implements Runnable{
             case "open":
                 accettaConnessioniInEntrata();
                 break;
-            case  "send":
+            case "send":
                 inviaMessaggio();
                 break;
             case "exit":
@@ -83,7 +77,11 @@ public class GestioneServer implements Runnable{
                 break;
         }
     }
-    public void accettaConnessioniInEntrata(){
+    /**
+     * Il metodo che riapre il socket del server e permette ad altri utenti di 
+     * connettersi
+     */
+    private void accettaConnessioniInEntrata(){
         if(!multi_server.getServerSocket().isClosed()){
             System.out.println("Server gia' aperto alle nuove connessioni.");
         }
@@ -92,7 +90,11 @@ public class GestioneServer implements Runnable{
             t.start(); 
         }
     }
-    public void chiudiConnessioniInEntrata(){
+    /**
+     * Il metodo che chiude il socketn del server e impedisce ad altri utenti 
+     * di connettersi
+     */
+    private void chiudiConnessioniInEntrata(){
             if(multi_server.getServerSocket().isClosed()){
                 System.out.println("Server gia' chiuso alle nuove connessioni.");
             }
@@ -122,10 +124,12 @@ public class GestioneServer implements Runnable{
         });
     }
     /**
-     * Il metodo che sconnette tutti i client connessi e poi chiude il server
+     * Il metodo che chiude il socket del server e disconnette tutti i client 
+     * connessi comunicando la chiusura del server
      */
     private void uscitaEDisconnessione(){
         System.out.println("Chiusura del server e delle connessioni.");
+        multi_server.chiudi();
         utenti_connessi.forEach((k,c) -> {
             try {
                 DataOutputStream dati_al_client=new DataOutputStream(c.getSocket().getOutputStream());
@@ -135,10 +139,8 @@ public class GestioneServer implements Runnable{
             } catch (IOException e) {
                 System.err.println(e.getMessage());
                 System.err.println("Errore durante la comunicazione con "+k+".");
-                //System.exit(0);
             }
         });
-        multi_server.chiudi();
         System.exit(0);
     }
     /**
@@ -153,7 +155,6 @@ public class GestioneServer implements Runnable{
             } catch (IOException e) {
                 System.err.println(e.getMessage());
                 System.err.println("Errore durante la comunicazione con "+k+".");
-                //System.exit(0);
             }
         });
     }

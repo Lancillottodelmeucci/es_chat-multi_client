@@ -3,20 +3,18 @@ package serverchatapplication;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * La classe che permette a più client di connettersi alla chat
+ * La classe che permette a più client di connettersi al server sul quale 
+ * risiede la chat
  * @author Giovanni Ciaranfi
  */
 public class MultiServer implements Runnable{
     private ServerSocket server_socket=null;
-    //private ArrayList<Socket> client_disponibili=new ArrayList();//da rimuovere
-    //private ArrayList<Thread> thread_in_esecuzione=new ArrayList();//da rimuovere
     private HashMap<String,Connessioni> utenti_connessi=new HashMap();
     /**
-     * Il costruttore della classe che apre il socket del server
+     * Il costruttore della classe che crea il socket del server
      */
     public MultiServer(){
         try {
@@ -53,10 +51,7 @@ public class MultiServer implements Runnable{
                 client_socket=null;
                 break;
             }
-            Thread t;
-            ServerChat server_thread=new ServerChat(client_socket,utenti_connessi);
-            t=new Thread(server_thread);
-            //Connessioni c=new Connessioni(client_socket, t);//da commentare
+            Thread t=new Thread(new ServerChat(client_socket,utenti_connessi));
             t.start();
         }
     }
@@ -80,6 +75,10 @@ public class MultiServer implements Runnable{
     public ServerSocket getServerSocket(){
         return (server_socket);
     }
+    /**
+     * 
+     * @return la mappa degli utenti connessi
+     */
     public HashMap<String,Connessioni> getUtentiConnessi(){
         return (utenti_connessi);
     }
