@@ -93,6 +93,10 @@ public class InterfacciaUtente extends JFrame{
             inserimento.setText("");
             inserimento.requestFocus();
             if(appoM.getTesto().equalsIgnoreCase("FINE")&&!appoM.getDestinatario().equals("mainGroupChat")){
+                /*
+                improvememt:
+                gestire anche il nuovo click sulle persone con chat rimosse
+                */
                 multiChat.remove(multiChat.getSelectedIndex());
                 return;
             }
@@ -112,6 +116,8 @@ public class InterfacciaUtente extends JFrame{
                 improvement:
                 aumentare solo se necessario, contando il numero di label e sommando la loro altezza
                 usare instanceof se necessario sulle jlabel
+                gestire in modo differente la dimensione delle etichette per poter leggere anche quelle
+                più lunghe di una riga
                 */
                 SwingUtilities.updateComponentTreeUI(appo);
                 dati_al_server.writeBytes(appoM.toString()+"\n");
@@ -159,7 +165,6 @@ public class InterfacciaUtente extends JFrame{
         send=new JButton("Verifica");
         send.setBounds(350, 250, 100, 50);
         send.addActionListener((ActionEvent ev) -> {
-            //String rispServ;
             try {
                 if(jcb.isSelected()){
                     dati_al_server.writeBytes(new Messaggio("", Messaggio.INVIO_NOME).toString()+'\n');

@@ -185,7 +185,7 @@ public class ServerChat implements Runnable{
         if(n.equals("")||n==null){
             return (true);
         }
-        if(!Pattern.matches("^[\\w_-]{3,}$", n)){
+        if(!Pattern.matches("^[\\w_-]{3,20}$", n)){
             return (false);
         }
         if(utenti_connessi.containsKey(n)){
