@@ -3,18 +3,18 @@ package serverchatapplication;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
- * La classe che permette a più client di connettersi alla chat
+ * La classe che permette a più client di connettersi al server sul quale 
+ * risiede la chat
  * @author Giovanni Ciaranfi
  */
 public class MultiServer implements Runnable{
     private ServerSocket server_socket=null;
-    private ArrayList<Socket> client_disponibili=new ArrayList();
-    private ArrayList<Thread> thread_in_esecuzione=new ArrayList();
+    private HashMap<String,Connessioni> utenti_connessi=new HashMap();
     /**
-     * Il costruttore della classe che apre il socket del server
+     * Il costruttore della classe che crea il socket del server
      */
     public MultiServer(){
         try {
@@ -42,7 +42,7 @@ public class MultiServer implements Runnable{
             }
         }
         for(;;){
-            System.out.println("Nuovo thread in attesa di un client.");
+            System.out.println("Server in attesa di un nuovo client.");//Server in attesa di un nuovo client
             Socket client_socket;
             try {
                 client_socket=server_socket.accept();
@@ -51,11 +51,7 @@ public class MultiServer implements Runnable{
                 client_socket=null;
                 break;
             }
-            client_disponibili.add(client_socket);
-            Thread t;
-            ServerChat server_thread=new ServerChat(client_socket,client_disponibili,thread_in_esecuzione);
-            t=new Thread(server_thread);
-            thread_in_esecuzione.add(t);
+            Thread t=new Thread(new ServerChat(client_socket,utenti_connessi));
             t.start();
         }
     }
@@ -81,16 +77,9 @@ public class MultiServer implements Runnable{
     }
     /**
      * 
-     * @return la lista dei thread che gestiscono i client
+     * @return la mappa degli utenti connessi
      */
-    public ArrayList<Thread> getThreads(){
-        return (thread_in_esecuzione);
-    }
-    /**
-     * 
-     * @return la lista dei socket dei client
-     */
-    public ArrayList<Socket> getSockets(){
-        return (client_disponibili);
+    public HashMap<String,Connessioni> getUtentiConnessi(){
+        return (utenti_connessi);
     }
 }
